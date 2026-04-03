@@ -48,9 +48,12 @@ jupyter lab
 1. **Linear algebra refresh** → `docs/01-linear-algebra/README.md`
 2. **Qubits & states** → `docs/02-qubits-and-states/README.md`
 3. **Measurement** → `docs/03-measurement/README.md`
+4. **Bell states & entanglement** → `notebooks/02-bell-entanglement.ipynb`
 4. **Entanglement** → `docs/04-entanglement/README.md`
 5. **Circuits & gates** → `docs/05-circuits-and-gates/README.md`
 6. **Noise & channels** → `docs/06-noise-and-channels/README.md`
+   - Notebook: `notebooks/03-noise-fidelity.ipynb`
+   - Bonus: `notebooks/04-chsh.ipynb`
 7. **Hardware overview** → `docs/08-hardware/README.md`
 
 ---
