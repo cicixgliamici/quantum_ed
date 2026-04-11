@@ -1,123 +1,145 @@
-# Entanglement
+# Noise & Quantum Channels
 
-When we combine two qubits, the joint system lives in
+Real quantum devices are noisy.
 
-$$
-\mathbb{C}^2 \otimes \mathbb{C}^2
-$$
+The ideal picture of perfectly unitary evolution is extremely useful, but real hardware is affected by decoherence, imperfect control, and imperfect measurement.
 
-which is a 4-dimensional complex vector space.
-
-This is where one of the most distinctive features of quantum theory appears: **entanglement**.
+To model this, we use **quantum channels**.
 
 ---
 
-## 1. Product states
+## 1. Why noise matters
 
-A two-qubit state is called a **product state** or **separable state** if it can be written as
+In a perfectly isolated system, evolution is described by unitary matrices.
 
-$$
-|\psi\rangle \otimes |\phi\rangle
-$$
+In real devices, however, the system interacts with its environment.
 
-for some one-qubit states $|\psi\rangle$ and $|\phi\rangle$.
+This can cause:
 
-Example:
+- loss of coherence
+- energy relaxation
+- drift away from the intended target state
 
-$$
-|0\rangle \otimes |1\rangle = |01\rangle
-$$
+That is why noise is not a side topic.
 
-This is a separable state.
-
-The two qubits are described independently.
+It is part of the core language of realistic quantum computing.
 
 ---
 
-## 2. Entangled states
+## 2. Density-matrix viewpoint
 
-A state is **entangled** if it cannot be written as a product state.
+Noise is most naturally described using density matrices.
 
-That means the global system is well defined, but the two subsystems cannot be treated as fully independent pure states.
+Instead of only working with pure states $|\psi\rangle$, we work with
 
-This is not just a mathematical curiosity.
+$$
+\rho
+$$
 
-Entanglement is central to:
+A quantum channel acts as a map
 
-- Bell inequalities
-- teleportation
-- superdense coding
-- quantum advantage more broadly
+$$
+\rho \mapsto \mathcal{E}(\rho)
+$$
+
+This lets us describe:
+
+- pure states
+- mixed states
+- subsystem states
+- noisy evolution
 
 ---
 
-## 3. Bell state example
+## 3. Depolarizing noise
 
-A classic example is the Bell state
-
-$$
-|\Phi^+\rangle = \frac{1}{\sqrt{2}}\left(|00\rangle + |11\rangle\right)
-$$
-
-This state cannot be written as
+A simple model of depolarizing noise is
 
 $$
-|\psi\rangle \otimes |\phi\rangle
+\rho \mapsto (1-p)\rho + p \frac{I}{2}
 $$
 
-so it is not separable.
+Here:
 
-It is one of the simplest and most important examples of entanglement.
+- $p = 0$ means no noise
+- $p = 1$ means the state becomes maximally mixed
+
+So depolarizing noise pushes the system toward
+
+$$
+\frac{I}{2}
+$$
+
+which represents complete one-qubit uncertainty.
 
 ---
 
-## 4. Why entanglement matters
+## 4. Dephasing noise
 
-The key idea is that the global state may be pure even when the parts do not admit an independent pure-state description.
+Dephasing noise reduces phase coherence while preserving basis populations.
 
-This becomes clearer when we move from state vectors to density matrices.
+A simple one-qubit form is:
 
-For an entangled two-qubit state:
+$$
+\rho =
+\begin{pmatrix}
+\rho_{00} & \rho_{01} \\
+\rho_{10} & \rho_{11}
+\end{pmatrix}
+\mapsto
+\begin{pmatrix}
+\rho_{00} & (1-p)\rho_{01} \\
+(1-p)\rho_{10} & \rho_{11}
+\end{pmatrix}
+$$
 
-- the full system can be pure
-- a single qubit, viewed alone, can appear mixed
+So the diagonal terms remain unchanged, while the off-diagonal terms shrink.
 
-This is why entanglement naturally leads to:
-
-- reduced density matrices
-- partial trace
-- subsystem-based reasoning
+This is why dephasing is often described as coherence loss.
 
 ---
 
-## 5. From Bell states to reduced states
+## 5. Fidelity
 
-If we form the density matrix
+To measure how much noise degrades a target state, we use **fidelity**.
+
+For a pure target state $|\psi\rangle$ and a density matrix $\rho$, the fidelity is
 
 $$
-\rho_{AB} = |\Phi^+\rangle \langle \Phi^+|
+F = \langle \psi | \rho | \psi \rangle
 $$
 
-and then trace out one qubit, the remaining qubit is described by a reduced density matrix.
+A value near $1$ means the noisy state is still close to the target state.
 
-For Bell states, that reduced state is maximally mixed.
+A value farther from $1$ means the state has drifted away more substantially.
 
-This is one of the most important conceptual bridges in quantum information.
+---
+
+## 6. Why this chapter matters
+
+Noise and channels connect the abstract mathematical formalism to real implementation limits.
+
+They also connect naturally to:
+
+- density matrices
+- hardware constraints
+- realistic simulation
+
+This is one of the key places where “ideal quantum computing” becomes “physical quantum computing”.
 
 ---
 
 ## In code
 
-Relevant functions and objects in this repository:
+Relevant functions in this repository:
 
-- `kron_n`
-- `CNOT`
-- `rho_from_ket`
-- `partial_trace_two_qubits`
+- `depolarize_rho`
+- `dephase_rho`
+- `fidelity_pure`
 
 Main files:
 
-- `src/quantum_ed/gates.py`
+- `src/quantum_ed/channels.py`
 - `src/quantum_ed/density.py`
 
 ---
@@ -126,35 +148,36 @@ Main files:
 
 ### Exercise 1
 
-Explain why
+What happens to
 
 $$
-|00\rangle
+|0\rangle\langle 0|
 $$
 
-is separable.
+under full depolarizing noise with $p=1$?
 
 ### Exercise 2
 
-Write the Bell state
+What happens to the off-diagonal terms of
 
 $$
-|\Phi^+\rangle = \frac{1}{\sqrt{2}}(|00\rangle + |11\rangle)
+|+\rangle\langle +|
 $$
 
-and explain why it is not a simple tensor product.
+under full dephasing with $p=1$?
 
 ### Exercise 3
 
-Why does entanglement force us to think about subsystems differently from classical product descriptions?
+Why is the density-matrix formalism more natural than pure state vectors when describing noise?
 
 ---
 
-## Notebook
+## Extras
 
-- `../../notebooks/02-bell-entanglement.ipynb`
+- Fidelity notes: `FIDELITY.md`
+- Notebook: `../../notebooks/03-noise-fidelity.ipynb`
 
 ## Next
 
 - `docs/07-density-matrices/README.md`
-- `docs/06-noise-and-channels/README.md`
+- `docs/08-hardware/README.md`
