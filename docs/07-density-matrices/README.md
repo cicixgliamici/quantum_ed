@@ -23,36 +23,23 @@ This object contains the same physical information as the ket, but in matrix for
 Example:
 
 $$
-|0\rangle =
-\begin{pmatrix}
-1 \\
-0
-\end{pmatrix}
-\quad \Rightarrow \quad
-\rho_0 =
-|0\rangle\langle 0|
-=
-\begin{pmatrix}
-1 & 0 \\
-0 & 0
-\end{pmatrix}
+|0\rangle = \begin{pmatrix} 1 \\ 0 \end{pmatrix}
+$$
+
+$$
+\rho_0 = |0\rangle \langle 0| = \begin{pmatrix} 1 & 0 \\ 0 & 0 \end{pmatrix}
 $$
 
 Likewise, for
 
 $$
-|+\rangle = \frac{1}{\sqrt{2}} \left(|0\rangle + |1\rangle\right)
+|+\rangle = \frac{1}{\sqrt{2}} \left( |0\rangle + |1\rangle \right)
 $$
 
 we get
 
 $$
-\rho_+ =
-\frac{1}{2}
-\begin{pmatrix}
-1 & 1 \\
-1 & 1
-\end{pmatrix}
+\rho_+ = \frac{1}{2} \begin{pmatrix} 1 & 1 \\ 1 & 1 \end{pmatrix}
 $$
 
 ---
@@ -73,15 +60,11 @@ with:
 Example: a classical 50/50 mixture of $|0\rangle$ and $|1\rangle$ gives
 
 $$
-\rho =
-\frac{1}{2}|0\rangle\langle 0| +
-\frac{1}{2}|1\rangle\langle 1|
-=
-\frac{1}{2}
-\begin{pmatrix}
-1 & 0 \\
-0 & 1
-\end{pmatrix}
+\rho = \frac{1}{2}|0\rangle\langle 0| + \frac{1}{2}|1\rangle\langle 1|
+$$
+
+$$
+\rho = \frac{1}{2} \begin{pmatrix} 1 & 0 \\ 0 & 1 \end{pmatrix}
 $$
 
 This is **not** the same as the pure superposition $|+\rangle$.
@@ -95,17 +78,19 @@ That distinction is one of the main reasons density matrices matter.
 A valid density matrix must satisfy:
 
 1. **Hermitian**
-   $$
-   \rho^\dagger = \rho
-   $$
+
+$$
+\rho^\dagger = \rho
+$$
 
 2. **Positive semidefinite**  
    all eigenvalues are non-negative
 
 3. **Trace one**
-   $$
-   \mathrm{Tr}(\rho) = 1
-   $$
+
+$$
+\mathrm{Tr}(\rho) = 1
+$$
 
 These are the core mathematical checks for physical validity.
 
@@ -116,11 +101,7 @@ These are the core mathematical checks for physical validity.
 For a qubit density matrix
 
 $$
-\rho =
-\begin{pmatrix}
-\rho_{00} & \rho_{01} \\
-\rho_{10} & \rho_{11}
-\end{pmatrix}
+\rho = \begin{pmatrix} \rho_{00} & \rho_{01} \\ \rho_{10} & \rho_{11} \end{pmatrix}
 $$
 
 - the diagonal terms describe basis populations
@@ -137,8 +118,7 @@ This is why dephasing is often described as “loss of phase information”.
 Suppose two qubits are entangled in a Bell state:
 
 $$
-|\Phi^+\rangle =
-\frac{1}{\sqrt{2}} \left(|00\rangle + |11\rangle\right)
+|\Phi^+\rangle = \frac{1}{\sqrt{2}} \left( |00\rangle + |11\rangle \right)
 $$
 
 The full system is pure:
