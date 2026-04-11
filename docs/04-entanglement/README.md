@@ -1,41 +1,160 @@
 # Entanglement
 
-Two-qubit states live in a 4D space:
+When we combine two qubits, the joint system lives in
 
 $$
 \mathbb{C}^2 \otimes \mathbb{C}^2
 $$
 
-A classic example is the Bell state:
+which is a 4-dimensional complex vector space.
 
-$$
-|\Phi^+\rangle = \frac{1}{\sqrt{2}} \left(|00\rangle + |11\rangle\right)
-$$
+This is where one of the most distinctive features of quantum theory appears: **entanglement**.
 
-This state cannot be written as:
+---
+
+## 1. Product states
+
+A two-qubit state is called a **product state** or **separable state** if it can be written as
 
 $$
 |\psi\rangle \otimes |\phi\rangle
 $$
 
-so it is **not separable**.
+for some one-qubit states $|\psi\rangle$ and $|\phi\rangle$.
 
-Entanglement is one of the key differences between classical and quantum information.
-Even when the global system is in a pure state, a subsystem can look mixed.
+Example:
 
-We will later use:
+$$
+|0\rangle \otimes |1\rangle = |01\rangle
+$$
 
-- reduced density matrices via partial trace
-- Bell states as canonical entangled examples
-- entanglement entropy at an introductory level
+This is a separable state.
 
-## Intuition
+The two qubits are described independently.
 
-If a two-qubit state can be factorized into one state for the first qubit and one state for the second, then it is not entangled.
+---
 
-If it cannot be factorized, then the state contains genuinely quantum correlations.
+## 2. Entangled states
+
+A state is **entangled** if it cannot be written as a product state.
+
+That means the global system is well defined, but the two subsystems cannot be treated as fully independent pure states.
+
+This is not just a mathematical curiosity.
+
+Entanglement is central to:
+
+- Bell inequalities
+- teleportation
+- superdense coding
+- quantum advantage more broadly
+
+---
+
+## 3. Bell state example
+
+A classic example is the Bell state
+
+$$
+|\Phi^+\rangle = \frac{1}{\sqrt{2}}\left(|00\rangle + |11\rangle\right)
+$$
+
+This state cannot be written as
+
+$$
+|\psi\rangle \otimes |\phi\rangle
+$$
+
+so it is not separable.
+
+It is one of the simplest and most important examples of entanglement.
+
+---
+
+## 4. Why entanglement matters
+
+The key idea is that the global state may be pure even when the parts do not admit an independent pure-state description.
+
+This becomes clearer when we move from state vectors to density matrices.
+
+For an entangled two-qubit state:
+
+- the full system can be pure
+- a single qubit, viewed alone, can appear mixed
+
+This is why entanglement naturally leads to:
+
+- reduced density matrices
+- partial trace
+- subsystem-based reasoning
+
+---
+
+## 5. From Bell states to reduced states
+
+If we form the density matrix
+
+$$
+\rho_{AB} = |\Phi^+\rangle \langle \Phi^+|
+$$
+
+and then trace out one qubit, the remaining qubit is described by a reduced density matrix.
+
+For Bell states, that reduced state is maximally mixed.
+
+This is one of the most important conceptual bridges in quantum information.
+
+---
+
+## In code
+
+Relevant functions and objects in this repository:
+
+- `kron_n`
+- `CNOT`
+- `rho_from_ket`
+- `partial_trace_two_qubits`
+
+Main files:
+
+- `src/quantum_ed/gates.py`
+- `src/quantum_ed/density.py`
+
+---
+
+## Exercises
+
+### Exercise 1
+
+Explain why
+
+$$
+|00\rangle
+$$
+
+is separable.
+
+### Exercise 2
+
+Write the Bell state
+
+$$
+|\Phi^+\rangle = \frac{1}{\sqrt{2}}(|00\rangle + |11\rangle)
+$$
+
+and explain why it is not a simple tensor product.
+
+### Exercise 3
+
+Why does entanglement force us to think about subsystems differently from classical product descriptions?
+
+---
+
+## Notebook
+
+- `../../notebooks/02-bell-entanglement.ipynb`
 
 ## Next
 
-- Density matrices and partial trace
-- Bell-state experiments in notebooks
+- `docs/07-density-matrices/README.md`
+- `docs/06-noise-and-channels/README.md`
