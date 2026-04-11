@@ -12,17 +12,17 @@ But in realistic quantum computing we also need a more general formalism, becaus
 
 ## 1. From pure states to density matrices
 
-If a system is in a pure state `|psi>`, its density matrix is
+If a system is in a pure state $|\psi\rangle$, its density matrix is
 
-\[
+$$
 \rho = |\psi\rangle \langle \psi|
-\]
+$$
 
 This object contains the same physical information as the ket, but in matrix form.
 
 Example:
 
-\[
+$$
 |0\rangle =
 \begin{pmatrix}
 1 \\
@@ -36,24 +36,24 @@ Example:
 1 & 0 \\
 0 & 0
 \end{pmatrix}
-\]
+$$
 
 Likewise, for
 
-\[
+$$
 |+\rangle = \frac{1}{\sqrt{2}} \left(|0\rangle + |1\rangle\right)
-\]
+$$
 
 we get
 
-\[
+$$
 \rho_+ =
 \frac{1}{2}
 \begin{pmatrix}
 1 & 1 \\
 1 & 1
 \end{pmatrix}
-\]
+$$
 
 ---
 
@@ -61,18 +61,18 @@ we get
 
 A mixed state is not a single ket, but a probabilistic ensemble:
 
-\[
+$$
 \rho = \sum_i p_i |\psi_i\rangle \langle \psi_i|
-\]
+$$
 
 with:
 
-- \( p_i \ge 0 \)
-- \( \sum_i p_i = 1 \)
+- $p_i \ge 0$
+- $\sum_i p_i = 1$
 
-Example: a classical 50/50 mixture of `|0>` and `|1>` gives
+Example: a classical 50/50 mixture of $|0\rangle$ and $|1\rangle$ gives
 
-\[
+$$
 \rho =
 \frac{1}{2}|0\rangle\langle 0| +
 \frac{1}{2}|1\rangle\langle 1|
@@ -82,9 +82,9 @@ Example: a classical 50/50 mixture of `|0>` and `|1>` gives
 1 & 0 \\
 0 & 1
 \end{pmatrix}
-\]
+$$
 
-This is **not** the same as the pure superposition `|+>`.
+This is **not** the same as the pure superposition $|+\rangle$.
 
 That distinction is one of the main reasons density matrices matter.
 
@@ -95,17 +95,17 @@ That distinction is one of the main reasons density matrices matter.
 A valid density matrix must satisfy:
 
 1. **Hermitian**
-   \[
+   $$
    \rho^\dagger = \rho
-   \]
+   $$
 
-2. **Positive semidefinite**
+2. **Positive semidefinite**  
    all eigenvalues are non-negative
 
 3. **Trace one**
-   \[
+   $$
    \mathrm{Tr}(\rho) = 1
-   \]
+   $$
 
 These are the core mathematical checks for physical validity.
 
@@ -115,13 +115,13 @@ These are the core mathematical checks for physical validity.
 
 For a qubit density matrix
 
-\[
+$$
 \rho =
 \begin{pmatrix}
 \rho_{00} & \rho_{01} \\
 \rho_{10} & \rho_{11}
 \end{pmatrix}
-\]
+$$
 
 - the diagonal terms describe basis populations
 - the off-diagonal terms encode **coherence**
@@ -136,28 +136,28 @@ This is why dephasing is often described as “loss of phase information”.
 
 Suppose two qubits are entangled in a Bell state:
 
-\[
+$$
 |\Phi^+\rangle =
-\frac{1}{\sqrt{2}} (|00\rangle + |11\rangle)
-\]
+\frac{1}{\sqrt{2}} \left(|00\rangle + |11\rangle\right)
+$$
 
 The full system is pure:
 
-\[
+$$
 \rho_{AB} = |\Phi^+\rangle \langle \Phi^+|
-\]
+$$
 
 But if we look only at qubit A, we compute the **partial trace** over B:
 
-\[
+$$
 \rho_A = \mathrm{Tr}_B(\rho_{AB})
-\]
+$$
 
 and obtain
 
-\[
+$$
 \rho_A = \frac{I}{2}
-\]
+$$
 
 So the subsystem is maximally mixed, even though the global state is pure.
 
@@ -169,9 +169,9 @@ This is one of the most important conceptual points in quantum information.
 
 Noise channels are often written as maps
 
-\[
+$$
 \rho \mapsto \mathcal{E}(\rho)
-\]
+$$
 
 In this repository, we currently implement simple one-qubit channels such as:
 
@@ -204,22 +204,26 @@ Suggested reading order:
 ## 8. Exercises
 
 ### Exercise 1
-Compute the density matrix of:
 
-\[
+Compute the density matrix of
+
+$$
 |+\rangle = \frac{|0\rangle + |1\rangle}{\sqrt{2}}
-\]
+$$
 
 and identify diagonal and off-diagonal terms.
 
 ### Exercise 2
-Show explicitly that the 50/50 classical mixture of `|0>` and `|1>` is different from the pure state `|+>`.
+
+Show explicitly that the 50/50 classical mixture of $|0\rangle$ and $|1\rangle$ is different from the pure state $|+\rangle$.
 
 ### Exercise 3
-Take a Bell state, form `rho_AB`, then compute the reduced state of one qubit. What do you observe?
+
+Take a Bell state, form $\rho_{AB}$, then compute the reduced state of one qubit. What do you observe?
 
 ### Exercise 4
-Apply dephasing to `|+><+|` and describe what changes as the parameter `p` grows from `0` to `1`.
+
+Apply dephasing to $|+\rangle\langle +|$ and describe what changes as the parameter $p$ grows from $0$ to $1$.
 
 ---
 
