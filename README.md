@@ -153,11 +153,11 @@ jupyter lab
 
 Improvements are welcome, especially:
 
-* clearer explanations,
-* additional exercises,
-* more tests,
-* better notebook visualizations,
-* and careful extensions of the current theoretical scope.
+* clearer explanations
+* additional exercises
+* more tests
+* better notebook visualizations
+* careful extensions of the current theoretical scope
 
 ---
 
