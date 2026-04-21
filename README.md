@@ -1,27 +1,134 @@
-# Quantum-Ed — Quantum Computing, Information & Hardware (Educational Repo)
+# Quantum-Ed — Quantum Computing, Information & Hardware
 
-A hands-on, educational repository to learn **Quantum Computing** from first principles:
+Quantum-Ed is an educational repository for learning **quantum computing** from first principles through a combination of:
+- structured theory notes,
+- runnable notebooks,
+- small reusable Python modules,
+- and tests that validate the underlying mathematics.
 
-- 📚 **Theory in Markdown** (`docs/`)
-- 🧪 **Interactive notebooks** (`notebooks/`)
-- 🧰 **Reusable Python code** (`src/quantum_ed/`)
-- ✅ **Tests** (`tests/`) to keep the math honest
-
-This repo is designed to scale from *“I know linear algebra”* to *“I can reason about circuits, noise, and hardware constraints.”*
+The goal of the repository is not just to collect notes, but to build a **rigorous and inspectable learning path** from basic linear algebra to circuits, measurement, entanglement, noise, and hardware-aware reasoning.
 
 ---
 
-## Quick start
+## Why this repository matters
 
-### Option A — Conda (recommended)
+Many quantum-computing repositories jump immediately into frameworks or high-level APIs.
+
+Quantum-Ed is designed differently:
+- it emphasizes the **mathematical foundations**,
+- keeps core ideas **transparent and inspectable**,
+- and uses code as a way to make theory testable.
+
+This makes the repository useful both as a study resource and as a compact technical project showing:
+- scientific computing structure,
+- mathematical clarity,
+- educational repository design,
+- and disciplined use of notebooks, code, and tests together.
+
+---
+
+## Repository structure
+
+- `docs/` — structured theory chapters in Markdown
+- `notebooks/` — runnable Jupyter lessons and demonstrations
+- `src/quantum_ed/` — small Python modules for core concepts
+- `demos/` — lightweight scripts for quick experiments
+- `tests/` — tests validating states, gates, measurement, and related behavior
+
+---
+
+## Current implemented focus
+
+At the current stage, the repository is focused on a compact but solid foundation:
+
+- linear algebra refresh for quantum computing
+- qubits and state-vector representation
+- measurement basics
+- Bell states and introductory entanglement material
+- introductory circuits and gates
+- first notes toward noise, channels, and hardware constraints
+
+The aim is to make these parts **clear, runnable, and extensible**, rather than to cover every topic superficially.
+
+---
+
+## Planned expansion
+
+Planned future extensions include:
+- additional notebooks on noise and fidelity
+- more hardware-oriented sections
+- optional comparisons with established ecosystems such as Qiskit or Cirq
+- more exercises and validation tests
+- broader coverage of quantum information and algorithmic examples
+
+This section exists to clearly separate **what is already implemented** from **what is planned next**.
+
+---
+
+## Learning path
+
+A good path through the repository is:
+
+1. **Linear algebra refresh**  
+   `docs/01-linear-algebra/README.md`
+
+2. **Qubits and states**  
+   `docs/02-qubits-and-states/README.md`
+
+3. **Measurement**  
+   `docs/03-measurement/README.md`
+
+4. **Entanglement and Bell states**  
+   `docs/04-entanglement/README.md`  
+   `notebooks/02-bell-entanglement.ipynb`
+
+5. **Circuits and gates**  
+   `docs/05-circuits-and-gates/README.md`
+
+6. **Noise and channels**  
+   `docs/06-noise-and-channels/README.md`
+
+7. **Hardware overview**  
+   `docs/08-hardware/README.md`
+
+---
+
+## Quick reviewer guide
+
+If you want to evaluate the repository quickly, the best path is:
+
+1. Read this README for the project goal and scope.
+2. Open `docs/` to inspect the structure of the theory material.
+3. Open one notebook such as `notebooks/02-bell-entanglement.ipynb`.
+4. Inspect `src/quantum_ed/` to see the supporting Python code.
+5. Check `tests/` to confirm that the mathematical components are being validated.
+
+---
+
+## Philosophy
+
+The repository follows a simple principle:
+
+> understand the math first, then use tools with intention.
+
+That is why the project starts from small, explicit implementations and educational notes before relying heavily on external quantum ecosystems.
+
+The objective is not to compete with mature frameworks, but to make their underlying ideas easier to understand and reason about.
+
+---
+
+## Getting started
+
+### Option A — Conda
 ```bash
 conda env create -f environment.yml
 conda activate quantum-ed
 python -m pytest -q
 jupyter lab
-```
+````
 
 ### Option B — pip
+
 ```bash
 python -m venv .venv
 # Windows: .venv\Scripts\activate
@@ -33,45 +140,24 @@ jupyter lab
 
 ---
 
-## Repository map
+## Typical use cases
 
-- `docs/` — structured chapters (Markdown)
-- `notebooks/` — runnable lessons (Jupyter)
-- `src/quantum_ed/` — minimal “from scratch” quantum toolkit (NumPy-based)
-- `demos/` — small scripts you can run from CLI
-- `tests/` — unit tests validating gates/measurement/noise
-
----
-
-## Learning path
-
-1. **Linear algebra refresh** → `docs/01-linear-algebra/README.md`
-2. **Qubits & states** → `docs/02-qubits-and-states/README.md`
-3. **Measurement** → `docs/03-measurement/README.md`
-4. **Bell states & entanglement** → `notebooks/02-bell-entanglement.ipynb`
-4. **Entanglement** → `docs/04-entanglement/README.md`
-5. **Circuits & gates** → `docs/05-circuits-and-gates/README.md`
-6. **Noise & channels** → `docs/06-noise-and-channels/README.md`
-   - Notebook: `notebooks/03-noise-fidelity.ipynb`
-   - Bonus: `notebooks/04-chsh.ipynb`
-7. **Hardware overview** → `docs/08-hardware/README.md`
-
----
-
-## Philosophy (why a small custom library?)
-
-Many QC tutorials jump straight into frameworks. Here we do both:
-
-- **From scratch**: state vectors, gates, measurement, noise (NumPy)
-- **Optional ecosystem**: later we can add Qiskit/Cirq notebooks as optional modules
-
-This makes the underlying math explicit and testable.
+* studying the mathematical foundations of quantum computing
+* using code to validate basic quantum operations
+* building a structured educational portfolio around physics-informed computing
+* creating a base for future extensions toward frameworks, noise models, and hardware-aware experiments
 
 ---
 
 ## Contributing
 
-PRs are welcome: fixes, better explanations, more exercises, plots, and additional hardware chapters.
+Improvements are welcome, especially:
+
+* clearer explanations,
+* additional exercises,
+* more tests,
+* better notebook visualizations,
+* and careful extensions of the current theoretical scope.
 
 ---
 
