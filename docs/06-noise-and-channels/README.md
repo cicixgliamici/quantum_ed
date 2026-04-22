@@ -4,7 +4,7 @@ Real quantum devices are noisy.
 
 The ideal picture of perfectly unitary evolution is extremely useful, but real hardware is affected by decoherence, imperfect control, and imperfect measurement.
 
-To model this, we use **quantum channels**.
+To model this, we use quantum channels.
 
 ---
 
@@ -101,7 +101,7 @@ This is why dephasing is often described as coherence loss.
 
 ## 5. Fidelity
 
-To measure how much noise degrades a target state, we use **fidelity**.
+To measure how much noise degrades a target state, we use fidelity.
 
 For a pure target state $|\psi\rangle$ and a density matrix $\rho$, the fidelity is
 
@@ -115,7 +115,25 @@ A value farther from $1$ means the state has drifted away more substantially.
 
 ---
 
-## 6. Why this chapter matters
+## 6. Additional simple channels
+
+This repository also benefits from a few other standard one-qubit channels:
+
+- bit-flip: swaps $|0\rangle$ and $|1\rangle$ with probability $p$
+- phase-flip: changes the relative phase with probability $p$
+- amplitude damping: models relaxation from $|1\rangle$ toward $|0\rangle$
+
+These are useful because they separate different physical effects:
+
+- depolarizing mixes toward uncertainty
+- dephasing removes coherence
+- bit-flip changes computational-basis populations
+- phase-flip changes relative phase
+- amplitude damping models energy loss
+
+---
+
+## 7. Why this chapter matters
 
 Noise and channels connect the abstract mathematical formalism to real implementation limits.
 
@@ -125,7 +143,7 @@ They also connect naturally to:
 - hardware constraints
 - realistic simulation
 
-This is one of the key places where “ideal quantum computing” becomes “physical quantum computing”.
+This is one of the key places where "ideal quantum computing" becomes "physical quantum computing".
 
 ---
 
@@ -135,6 +153,9 @@ Relevant functions in this repository:
 
 - `depolarize_rho`
 - `dephase_rho`
+- `bit_flip_rho`
+- `phase_flip_rho`
+- `amplitude_damp_rho`
 - `fidelity_pure`
 
 Main files:
@@ -167,6 +188,14 @@ $$
 under full dephasing with $p=1$?
 
 ### Exercise 3
+
+What state do you obtain by applying full amplitude damping to
+
+$$
+|1\rangle\langle 1|?
+$$
+
+### Exercise 4
 
 Why is the density-matrix formalism more natural than pure state vectors when describing noise?
 

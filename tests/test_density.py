@@ -2,7 +2,12 @@ import numpy as np
 
 from quantum_ed.states import ket0, normalize
 from quantum_ed.gates import H, CNOT, kron_n, apply
-from quantum_ed.density import rho_from_ket, fidelity_pure, partial_trace_two_qubits
+from quantum_ed.density import (
+    fidelity_pure,
+    partial_trace_two_qubits,
+    rho_from_ket,
+    trace_distance,
+)
 
 
 def bell_phi_plus() -> np.ndarray:
@@ -22,6 +27,17 @@ def test_fidelity_pure_is_one_for_same_state():
     psi = normalize(np.array([[1.0], [1.0]], dtype=complex))
     rho = rho_from_ket(psi)
     assert np.isclose(fidelity_pure(psi, rho), 1.0)
+
+
+def test_trace_distance_is_zero_for_identical_states():
+    rho = rho_from_ket(ket0())
+    assert np.isclose(trace_distance(rho, rho), 0.0)
+
+
+def test_trace_distance_is_one_for_orthogonal_basis_states():
+    rho0 = rho_from_ket(ket0())
+    rho1 = np.array([[0.0, 0.0], [0.0, 1.0]], dtype=complex)
+    assert np.isclose(trace_distance(rho0, rho1), 1.0)
 
 
 def test_partial_trace_of_bell_state_keep_first_qubit():

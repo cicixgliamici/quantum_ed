@@ -2,8 +2,20 @@ import numpy as np
 
 from quantum_ed.states import ket0, ket1, normalize
 from quantum_ed.gates import H, CNOT, kron_n, apply
-from quantum_ed.density import rho_from_ket, partial_trace_two_qubits, fidelity_pure
-from quantum_ed.channels import is_density_matrix, depolarize_rho, dephase_rho
+from quantum_ed.density import (
+    fidelity_pure,
+    partial_trace_two_qubits,
+    rho_from_ket,
+    trace_distance,
+)
+from quantum_ed.channels import (
+    amplitude_damp_rho,
+    bit_flip_rho,
+    dephase_rho,
+    depolarize_rho,
+    is_density_matrix,
+    phase_flip_rho,
+)
 
 
 def ket_plus() -> np.ndarray:
@@ -93,3 +105,45 @@ def test_partial_trace_returns_density_matrix():
 
     assert is_density_matrix(rho_a)
     assert is_density_matrix(rho_b)
+
+
+def test_bit_flip_on_zero_state_matches_one_state():
+    rho = rho_from_ket(ket0())
+    out = bit_flip_rho(rho, 1.0)
+    expected = rho_from_ket(ket1())
+    assert np.allclose(out, expected)
+
+
+def test_phase_flip_reduces_fidelity_of_plus_state():
+    psi = ket_plus()
+    rho = rho_from_ket(psi)
+    out = phase_flip_rho(rho, 0.5)
+
+    assert np.isclose(fidelity_pure(psi, out), 0.5)
+
+
+def test_amplitude_damping_reduces_excited_state_population():
+    rho = rho_from_ket(ket1())
+    out = amplitude_damp_rho(rho, 0.4)
+
+    expected = np.array([[0.4, 0.0], [0.0, 0.6]], dtype=complex)
+    assert np.allclose(out, expected)
+
+
+def test_new_channels_keep_trace_one():
+    rho = rho_from_ket(ket_plus())
+
+    for out in (
+        bit_flip_rho(rho, 0.2),
+        phase_flip_rho(rho, 0.2),
+        amplitude_damp_rho(rho, 0.2),
+    ):
+        assert np.allclose(np.trace(out), 1.0)
+
+
+def test_dephasing_increases_trace_distance_from_plus_state():
+    psi = ket_plus()
+    rho = rho_from_ket(psi)
+    out = dephase_rho(rho, 1.0)
+
+    assert np.isclose(trace_distance(rho, out), 0.5)

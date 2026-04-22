@@ -10,20 +10,39 @@ This module intentionally stays minimal and educational.
 """
 
 from __future__ import annotations
+
 import numpy as np
-from .linalg import dagger, trace, projector
+
+from .linalg import dagger, projector, trace
+
 
 def rho_from_ket(ket: np.ndarray) -> np.ndarray:
     """Return density matrix rho = |psi><psi|."""
     return projector(ket)
 
+
 def fidelity_pure(ket: np.ndarray, rho: np.ndarray) -> float:
-    """Fidelity between pure state |psi> and density matrix rho:
-        F = <psi| rho |psi>
+    """Fidelity between pure state |psi> and density matrix rho.
+
+    F = <psi| rho |psi>
     """
-    ket = ket.reshape((-1,1))
+    ket = ket.reshape((-1, 1))
     val = (dagger(ket) @ rho @ ket).item()
     return float(np.real(val))
+
+
+def trace_distance(rho: np.ndarray, sigma: np.ndarray) -> float:
+    """Trace distance between two density matrices.
+
+    D(rho, sigma) = 1/2 * ||rho - sigma||_1
+
+    For Hermitian rho - sigma, this equals half the sum of the absolute
+    eigenvalues of rho - sigma.
+    """
+    delta = rho - sigma
+    eigvals = np.linalg.eigvalsh(delta)
+    return 0.5 * float(np.sum(np.abs(eigvals)))
+
 
 def partial_trace_two_qubits(rho: np.ndarray, keep: int) -> np.ndarray:
     """Partial trace of a 2-qubit density matrix (4x4).
@@ -33,38 +52,32 @@ def partial_trace_two_qubits(rho: np.ndarray, keep: int) -> np.ndarray:
 
     Returns a 2x2 density matrix.
     """
-    if rho.shape != (4,4):
+    if rho.shape != (4, 4):
         raise ValueError("rho must be 4x4 for two qubits")
-    if keep not in (0,1):
+    if keep not in (0, 1):
         raise ValueError("keep must be 0 or 1")
 
-    # Index mapping: |ab> where a,b in {0,1}. Flatten ordering: 00,01,10,11.
-    # Trace out second qubit:
-    #   (rho_A)_{a,a'} = sum_b rho_{ab, a'b}
-    # Trace out first qubit:
-    #   (rho_B)_{b,b'} = sum_a rho_{ab, ab'}
-    out = np.zeros((2,2), dtype=complex)
+    out = np.zeros((2, 2), dtype=complex)
 
     if keep == 0:
-        for a in (0,1):
-            for ap in (0,1):
-                s = 0.0+0.0j
-                for b in (0,1):
-                    i = 2*a + b
-                    j = 2*ap + b
-                    s += rho[i,j]
-                out[a,ap] = s
+        for a in (0, 1):
+            for ap in (0, 1):
+                s = 0.0 + 0.0j
+                for b in (0, 1):
+                    i = 2 * a + b
+                    j = 2 * ap + b
+                    s += rho[i, j]
+                out[a, ap] = s
     else:
-        for b in (0,1):
-            for bp in (0,1):
-                s = 0.0+0.0j
-                for a in (0,1):
-                    i = 2*a + b
-                    j = 2*a + bp
-                    s += rho[i,j]
-                out[b,bp] = s
+        for b in (0, 1):
+            for bp in (0, 1):
+                s = 0.0 + 0.0j
+                for a in (0, 1):
+                    i = 2 * a + b
+                    j = 2 * a + bp
+                    s += rho[i, j]
+                out[b, bp] = s
 
-    # normalize numerical drift
     tr = trace(out)
     if abs(tr) > 0:
         out = out / tr

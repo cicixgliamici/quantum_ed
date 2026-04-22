@@ -10,8 +10,14 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = ["numpy", "scipy", "matplotlib"]
 
+[project.optional-dependencies]
+dev = ["pytest>=8", "jupyterlab", "ipykernel"]
+
 [tool.setuptools]
 package-dir = {"" = "src"}
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

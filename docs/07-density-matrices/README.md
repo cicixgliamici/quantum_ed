@@ -1,11 +1,11 @@
 # Density Matrices
 
-State vectors are enough for **closed, pure-state** quantum systems.
+State vectors are enough for closed, pure-state quantum systems.
 
 But in realistic quantum computing we also need a more general formalism, because:
 
-- we may have **statistical mixtures**
-- we may only observe a **subsystem**
+- we may have statistical mixtures
+- we may only observe a subsystem
 - noise and decoherence are more naturally expressed on density matrices
 
 ---
@@ -67,7 +67,7 @@ $$
 \rho = \frac{1}{2} \begin{pmatrix} 1 & 0 \\ 0 & 1 \end{pmatrix}
 $$
 
-This is **not** the same as the pure superposition $|+\rangle$.
+This is not the same as the pure superposition $|+\rangle$.
 
 That distinction is one of the main reasons density matrices matter.
 
@@ -77,16 +77,16 @@ That distinction is one of the main reasons density matrices matter.
 
 A valid density matrix must satisfy:
 
-1. **Hermitian**
+1. Hermitian
 
 $$
 \rho^\dagger = \rho
 $$
 
-2. **Positive semidefinite**  
+2. Positive semidefinite  
    all eigenvalues are non-negative
 
-3. **Trace one**
+3. Trace one
 
 $$
 \mathrm{Tr}(\rho) = 1
@@ -105,11 +105,11 @@ $$
 $$
 
 - the diagonal terms describe basis populations
-- the off-diagonal terms encode **coherence**
+- the off-diagonal terms encode coherence
 
-Noise processes such as **dephasing** reduce off-diagonal terms while preserving populations.
+Noise processes such as dephasing reduce off-diagonal terms while preserving populations.
 
-This is why dephasing is often described as “loss of phase information”.
+This is why dephasing is often described as "loss of phase information".
 
 ---
 
@@ -127,7 +127,7 @@ $$
 \rho_{AB} = |\Phi^+\rangle \langle \Phi^+|
 $$
 
-But if we look only at qubit A, we compute the **partial trace** over B:
+But if we look only at qubit A, we compute the partial trace over B:
 
 $$
 \rho_A = \mathrm{Tr}_B(\rho_{AB})

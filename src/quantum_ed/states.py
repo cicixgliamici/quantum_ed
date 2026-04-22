@@ -4,6 +4,8 @@ from __future__ import annotations
 import numpy as np
 from .linalg import dagger
 
+StateVector = np.ndarray
+
 def ket0() -> np.ndarray:
     return np.array([[1.0],[0.0]], dtype=complex)
 
@@ -32,22 +34,22 @@ def basis_11() -> StateVector:
 
 def bell_phi_plus() -> StateVector:
     """Return the Bell state (|00> + |11>) / sqrt(2)."""
-    return (1 / np.sqrt(2)) * np.array([1, 0, 0, 1], dtype=complex)
+    return (1 / np.sqrt(2)) * np.array([[1], [0], [0], [1]], dtype=complex)
 
 
 def bell_phi_minus() -> StateVector:
     """Return the Bell state (|00> - |11>) / sqrt(2)."""
-    return (1 / np.sqrt(2)) * np.array([1, 0, 0, -1], dtype=complex)
+    return (1 / np.sqrt(2)) * np.array([[1], [0], [0], [-1]], dtype=complex)
 
 
 def bell_psi_plus() -> StateVector:
     """Return the Bell state (|01> + |10>) / sqrt(2)."""
-    return (1 / np.sqrt(2)) * np.array([0, 1, 1, 0], dtype=complex)
+    return (1 / np.sqrt(2)) * np.array([[0], [1], [1], [0]], dtype=complex)
 
 
 def bell_psi_minus() -> StateVector:
     """Return the Bell state (|01> - |10>) / sqrt(2)."""
-    return (1 / np.sqrt(2)) * np.array([0, 1, -1, 0], dtype=complex)
+    return (1 / np.sqrt(2)) * np.array([[0], [1], [-1], [0]], dtype=complex)
 
 def normalize(ket: np.ndarray, atol: float = 1e-12) -> np.ndarray:
     """Normalize a ket; raise if norm is ~0."""
