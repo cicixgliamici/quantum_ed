@@ -22,7 +22,7 @@ from .states import (
     normalize,
     state_from_bloch,
 )
-from .gates import I, X, Y, Z, H, S, T, CNOT, kron_n
+from .gates import CNOT, CZ, H, I, S, SWAP, T, X, Y, Z, apply, kron_n, rx, ry, rz
 from .measurement import measure_comp_basis, probs_comp_basis
 from .channels import (
     amplitude_damp_rho,
@@ -56,6 +56,12 @@ __all__ = [
     "S",
     "T",
     "CNOT",
+    "CZ",
+    "SWAP",
+    "rx",
+    "ry",
+    "rz",
+    "apply",
     "kron_n",
     "measure_comp_basis",
     "probs_comp_basis",
