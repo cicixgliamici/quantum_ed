@@ -1,39 +1,74 @@
 import numpy as np
 
-from quantum_ed.states import ket0, ket1, normalize
-from quantum_ed.gates import X, H, CNOT, kron_n, apply
+from quantum_ed.gates import CNOT, CZ, H, I, S, SWAP, T, X, Y, Z, apply, kron_n, rx, ry, rz
 from quantum_ed.linalg import is_unitary
+from quantum_ed.states import basis_00, basis_01, basis_10, basis_11, bell_phi_plus, ket0, ket1
 
 
-def test_hadamard_is_unitary():
-    assert is_unitary(H)
+def test_basic_gates_are_unitary() -> None:
+    for gate in [I, X, Y, Z, H, S, T, CNOT, CZ, SWAP, rx(0.3), ry(0.3), rz(0.3)]:
+        assert is_unitary(gate)
 
 
-def test_x_maps_ket0_to_ket1():
-    out = apply(X, ket0())
-    assert np.allclose(out, ket1())
+def test_pauli_gates_square_to_identity() -> None:
+    for gate in [X, Y, Z]:
+        assert np.allclose(gate @ gate, I)
 
 
-def test_h_maps_ket0_to_plus_state():
-    out = apply(H, ket0())
-    expected = normalize(np.array([[1.0], [1.0]], dtype=complex))
-    assert np.allclose(out, expected)
+def test_hadamard_square_is_identity() -> None:
+    assert np.allclose(H @ H, I)
 
 
-def test_kron_n_two_basis_states():
-    out = kron_n(ket0(), ket1())
-    expected = np.array([[0.0], [1.0], [0.0], [0.0]], dtype=complex)
-    assert np.allclose(out, expected)
+def test_phase_gate_relations() -> None:
+    assert np.allclose(S @ S, Z)
+    assert np.allclose(T @ T, S)
 
 
-def test_cnot_on_00_leaves_state_unchanged():
-    psi = kron_n(ket0(), ket0())
-    out = apply(CNOT, psi)
-    assert np.allclose(out, psi)
+def test_x_flips_computational_basis_states() -> None:
+    assert np.allclose(apply(X, ket0()), ket1())
+    assert np.allclose(apply(X, ket1()), ket0())
 
 
-def test_cnot_on_10_flips_second_qubit():
-    psi = kron_n(ket1(), ket0())
-    out = apply(CNOT, psi)
-    expected = kron_n(ket1(), ket1())
-    assert np.allclose(out, expected)
+def test_z_flips_phase_of_one_state() -> None:
+    assert np.allclose(apply(Z, ket0()), ket0())
+    assert np.allclose(apply(Z, ket1()), -ket1())
+
+
+def test_hadamard_creates_plus_state() -> None:
+    expected = (1 / np.sqrt(2)) * np.array([[1], [1]], dtype=complex)
+    assert np.allclose(apply(H, ket0()), expected)
+
+
+def test_cnot_truth_table() -> None:
+    assert np.allclose(apply(CNOT, basis_00()), basis_00())
+    assert np.allclose(apply(CNOT, basis_01()), basis_01())
+    assert np.allclose(apply(CNOT, basis_10()), basis_11())
+    assert np.allclose(apply(CNOT, basis_11()), basis_10())
+
+
+def test_cz_flips_only_11_phase() -> None:
+    assert np.allclose(apply(CZ, basis_00()), basis_00())
+    assert np.allclose(apply(CZ, basis_01()), basis_01())
+    assert np.allclose(apply(CZ, basis_10()), basis_10())
+    assert np.allclose(apply(CZ, basis_11()), -basis_11())
+
+
+def test_swap_exchanges_two_qubits() -> None:
+    assert np.allclose(apply(SWAP, basis_00()), basis_00())
+    assert np.allclose(apply(SWAP, basis_01()), basis_10())
+    assert np.allclose(apply(SWAP, basis_10()), basis_01())
+    assert np.allclose(apply(SWAP, basis_11()), basis_11())
+
+
+def test_bell_state_from_h_and_cnot() -> None:
+    state = basis_00()
+    state = apply(kron_n(H, I), state)
+    state = apply(CNOT, state)
+
+    assert np.allclose(state, bell_phi_plus())
+
+
+def test_rotations_at_zero_are_identity() -> None:
+    assert np.allclose(rx(0.0), I)
+    assert np.allclose(ry(0.0), I)
+    assert np.allclose(rz(0.0), I)
