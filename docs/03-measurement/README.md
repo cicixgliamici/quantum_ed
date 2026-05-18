@@ -1,6 +1,7 @@
 # Measurement
 
 ## Born rule (projective measurement in computational basis)
+
 Given \(|\psi\rangle = \alpha|0\rangle + \beta|1\rangle\), measuring in the \(|0\rangle,|1\rangle\) basis yields:
 
 - outcome 0 with probability \(|\alpha|^2\)
@@ -9,6 +10,7 @@ Given \(|\psi\rangle = \alpha|0\rangle + \beta|1\rangle\), measuring in the \(|0
 After measuring, the state collapses to the corresponding basis vector.
 
 ## Measurement operators
+
 Projectors:
 \[
 P_0 = |0\rangle\langle 0|,\quad P_1 = |1\rangle\langle 1|
