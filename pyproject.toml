@@ -12,12 +12,16 @@ dependencies = ["numpy", "scipy", "matplotlib"]
 
 [project.optional-dependencies]
 dev = ["pytest>=8", "jupyterlab", "ipykernel"]
+# Qiskit is optional so the NumPy-first core remains lightweight.
+showcase = ["qiskit>=2.0"]
 
 [tool.setuptools]
 package-dir = {"" = "src"}
 
 [tool.setuptools.packages.find]
 where = ["src"]
+# Showcase files are runnable portfolio examples, not importable library code.
+exclude = ["showcase*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

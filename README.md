@@ -1,9 +1,11 @@
 # Quantum-Ed - Quantum Computing, Information & Hardware
 
 Quantum-Ed is an educational repository for learning quantum computing from first principles through a combination of:
+
 - structured theory notes
 - runnable notebooks
 - small reusable Python modules
+- equivalent examples across multiple quantum ecosystems
 - tests that validate the underlying mathematics
 
 The goal of the repository is not just to collect notes, but to build a rigorous and inspectable learning path from basic linear algebra to circuits, measurement, entanglement, density matrices, noise, and hardware-aware reasoning.
@@ -15,14 +17,17 @@ The goal of the repository is not just to collect notes, but to build a rigorous
 Many quantum-computing repositories jump immediately into frameworks or high-level APIs.
 
 Quantum-Ed is designed differently:
+
 - it emphasizes the mathematical foundations
 - it keeps core ideas transparent and inspectable
 - it uses code as a way to make theory testable
 
 This makes the repository useful both as a study resource and as a compact technical project showing:
+
 - scientific computing structure
 - mathematical clarity
 - educational repository design
+- Qiskit, Q#, and OpenQASM 3 interoperability concepts
 - disciplined use of notebooks, code, and tests together
 
 ---
@@ -32,6 +37,7 @@ This makes the repository useful both as a study resource and as a compact techn
 - `docs/` - structured theory chapters in Markdown
 - `notebooks/` - runnable Jupyter lessons and demonstrations
 - `src/quantum_ed/` - small Python modules for core concepts
+- `src/showcase/` - equivalent Bell-state examples in Qiskit, Q#, and OpenQASM 3
 - `demos/` - lightweight scripts for quick experiments
 - `tests/` - tests validating states, gates, measurement, entanglement, and noise-related behavior
 
@@ -49,6 +55,7 @@ At the current stage, the repository is focused on a compact but solid foundatio
 - density matrices, partial trace, and fidelity
 - simple one-qubit noise channels
 - first notes toward hardware constraints
+- first query algorithms: Deutsch-Jozsa and Bernstein-Vazirani
 
 The aim is to make these parts clear, runnable, and extensible rather than to cover every topic superficially.
 
@@ -57,15 +64,18 @@ The aim is to make these parts clear, runnable, and extensible rather than to co
 ## What Is Implemented vs Planned
 
 Implemented today:
+
 - theory chapters for the current learning path in `docs/`
 - reusable NumPy-based utilities in `src/quantum_ed/`
+- side-by-side ecosystem examples in `src/showcase/`
 - notebooks for setup, Bloch sphere intuition, Bell states, noise, and CHSH
 - tests for the core math utilities and state transformations
 
 Planned future extensions include:
+
 - additional notebooks on noise and fidelity
 - more hardware-oriented sections
-- optional comparisons with established ecosystems such as Qiskit or Cirq
+- broader comparisons with established quantum ecosystems
 - more exercises and validation tests
 - broader coverage of quantum information and algorithmic examples
 
@@ -94,6 +104,7 @@ A good path through the repository is:
    `docs/06-noise-and-channels/README.md`
 8. Hardware overview  
    `docs/08-hardware/README.md`
+9. First quantum algorithms: `docs/10-quantum-algorithms/README.md`
 
 ---
 
@@ -158,6 +169,7 @@ For a fast technical review:
 3. Read the intro and one or two theory chapters in `docs/`.
 4. Inspect the NumPy-first implementations in `src/quantum_ed/`.
 5. Open one notebook or run a demo from `demos/`.
+6. Compare the Bell-state and first-algorithm implementations in `src/showcase/`.
 
 ---
 
