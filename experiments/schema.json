@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Quantum-Ed experiment",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "name",
+    "category",
+    "theory",
+    "expected_result",
+    "implementations"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "name": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "category": { "type": "string", "minLength": 1 },
+    "theory": { "type": "string", "pattern": "^docs/.+\\.md$" },
+    "expected_result": { "type": "string", "minLength": 1 },
+    "implementations": {
+      "type": "object",
+      "required": ["numpy", "qiskit", "qsharp", "openqasm"],
+      "additionalProperties": false,
+      "properties": {
+        "numpy": { "type": "string", "pattern": "\\.py$" },
+        "qiskit": { "type": "string", "pattern": "\\.py$" },
+        "qsharp": { "type": "string", "pattern": "\\.qs$" },
+        "openqasm": { "type": "string", "pattern": "\\.qasm$" }
+        ,"pennylane": { "type": "string", "pattern": "\\.py$" }
+      }
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "name": "bernstein-vazirani",
+  "category": "query-algorithm",
+  "theory": "docs/10-quantum-algorithms/bernstein-vazirani.md",
+  "expected_result": "The hidden string 101 is recovered deterministically.",
+  "implementations": {
+    "numpy": "experiments/bernstein-vazirani/numpy/bernstein_vazirani.py",
+    "qiskit": "experiments/bernstein-vazirani/qiskit/bernstein_vazirani.py",
+    "qsharp": "experiments/bernstein-vazirani/qsharp/BernsteinVazirani.qs",
+    "openqasm": "experiments/bernstein-vazirani/openqasm/bernstein_vazirani.qasm",
+    "pennylane": "experiments/bernstein-vazirani/pennylane/bernstein_vazirani.py"
+  }
+}

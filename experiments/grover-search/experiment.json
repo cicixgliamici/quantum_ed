@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "name": "grover-search",
+  "category": "search-algorithm",
+  "theory": "docs/10-quantum-algorithms/grover-search.md",
+  "expected_result": "The marked state 11 is recovered deterministically in the ideal two-qubit case.",
+  "implementations": {
+    "numpy": "experiments/grover-search/numpy/grover_search.py",
+    "qiskit": "experiments/grover-search/qiskit/grover_search.py",
+    "qsharp": "experiments/grover-search/qsharp/GroverSearch.qs",
+    "openqasm": "experiments/grover-search/openqasm/grover_search.qasm",
+    "pennylane": "experiments/grover-search/pennylane/grover_search.py"
+  }
+}

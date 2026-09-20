@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "name": "quantum-phase-estimation",
+  "category": "algorithmic-primitive",
+  "theory": "docs/10-quantum-algorithms/quantum-phase-estimation.md",
+  "expected_result": "Estimating the phase of the T gate on state 1 yields phase 1/8 (state 001) with probability 1.",
+  "implementations": {
+    "numpy": "experiments/quantum-phase-estimation/numpy/quantum_phase_estimation.py",
+    "qiskit": "experiments/quantum-phase-estimation/qiskit/quantum_phase_estimation.py",
+    "qsharp": "experiments/quantum-phase-estimation/qsharp/QuantumPhaseEstimation.qs",
+    "openqasm": "experiments/quantum-phase-estimation/openqasm/quantum_phase_estimation.qasm",
+    "pennylane": "experiments/quantum-phase-estimation/pennylane/quantum_phase_estimation.py"
+  }
+}

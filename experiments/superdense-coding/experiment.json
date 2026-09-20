@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "name": "superdense-coding",
+  "category": "communication",
+  "theory": "docs/04-entanglement/superdense-coding.md",
+  "expected_result": "The message 10 is decoded deterministically.",
+  "implementations": {
+    "numpy": "experiments/superdense-coding/numpy/superdense_coding.py",
+    "qiskit": "experiments/superdense-coding/qiskit/superdense_coding.py",
+    "qsharp": "experiments/superdense-coding/qsharp/SuperdenseCoding.qs",
+    "openqasm": "experiments/superdense-coding/openqasm/superdense_coding.qasm",
+    "pennylane": "experiments/superdense-coding/pennylane/superdense_coding.py"
+  }
+}

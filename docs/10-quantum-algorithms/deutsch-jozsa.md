@@ -76,9 +76,10 @@ The ideal per-qubit results are $x_0=1$, $x_1=0$, and $x_2=0$. Q# therefore
 returns `[One, Zero, Zero]`, while Qiskit's conventional highest-index-first
 display prints `001`. Each implementation documents its convention:
 
-- [Qiskit](../../src/showcase/qiskit/deutsch_jozsa.py)
-- [Q#](../../src/showcase/qsharp/DeutschJozsa.qs)
-- [OpenQASM 3](../../src/showcase/openqasm/deutsch_jozsa.qasm)
+- [Experiment guide](https://github.com/cicixgliamici/quantum_ed/tree/main/experiments/deutsch-jozsa)
+- [Qiskit](https://github.com/cicixgliamici/quantum_ed/blob/main/experiments/deutsch-jozsa/qiskit/deutsch_jozsa.py)
+- [Q#](https://github.com/cicixgliamici/quantum_ed/blob/main/experiments/deutsch-jozsa/qsharp/DeutschJozsa.qs)
+- [OpenQASM 3](https://github.com/cicixgliamici/quantum_ed/blob/main/experiments/deutsch-jozsa/openqasm/deutsch_jozsa.qasm)
 
 ## What the example teaches
 

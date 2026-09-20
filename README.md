@@ -5,7 +5,7 @@ Quantum-Ed is an educational repository for learning quantum computing from firs
 - structured theory notes
 - runnable notebooks
 - small reusable Python modules
-- equivalent examples across multiple quantum ecosystems
+- concept-first experiments across multiple quantum ecosystems
 - tests that validate the underlying mathematics
 
 The goal of the repository is not just to collect notes, but to build a rigorous and inspectable learning path from basic linear algebra to circuits, measurement, entanglement, density matrices, noise, and hardware-aware reasoning.
@@ -37,7 +37,9 @@ This makes the repository useful both as a study resource and as a compact techn
 - `docs/` - structured theory chapters in Markdown
 - `notebooks/` - runnable Jupyter lessons and demonstrations
 - `src/quantum_ed/` - small Python modules for core concepts
-- `src/showcase/` - equivalent Bell-state examples in Qiskit, Q#, and OpenQASM 3
+- `experiments/` - concept-first comparisons across five programming ecosystems
+- `exercises/` - property-driven prompts with executable reference solutions
+- `studies/` - focused comparisons for framework-specific capabilities
 - `demos/` - lightweight scripts for quick experiments
 - `tests/` - tests validating states, gates, measurement, entanglement, and noise-related behavior
 
@@ -51,6 +53,10 @@ At the current stage, the repository is focused on a compact but solid foundatio
 - qubits and state-vector representation
 - measurement basics
 - Bell states and introductory entanglement material
+- superdense coding as a first entanglement-assisted communication protocol
+- quantum teleportation in a portable deferred-measurement form
+- Grover search, the quantum Fourier transform, and a minimal VQE
+- PennyLane differentiable circuits and mixed-state simulation
 - introductory circuits and gates
 - density matrices, partial trace, and fidelity
 - simple one-qubit noise channels
@@ -67,7 +73,7 @@ Implemented today:
 
 - theory chapters for the current learning path in `docs/`
 - reusable NumPy-based utilities in `src/quantum_ed/`
-- side-by-side ecosystem examples in `src/showcase/`
+- side-by-side ecosystem examples grouped by concept in `experiments/`
 - notebooks for setup, Bloch sphere intuition, Bell states, noise, and CHSH
 - tests for the core math utilities and state transformations
 
@@ -99,9 +105,9 @@ A good path through the repository is:
 5. Circuits and gates  
    `docs/05-circuits-and-gates/README.md`
 6. Density matrices  
-   `docs/07-density-matrices/README.md`
+   `docs/06-density-matrices/README.md`
 7. Noise and channels  
-   `docs/06-noise-and-channels/README.md`
+   `docs/07-noise-and-channels/README.md`
 8. Hardware overview  
    `docs/08-hardware/README.md`
 9. First quantum algorithms: `docs/10-quantum-algorithms/README.md`
@@ -158,6 +164,19 @@ jupyter lab
 
 The editable install matters because the repository uses a `src/` layout.
 
+Validate the experiment contracts and all local documentation links with:
+
+```bash
+python tools/verify_repository.py
+```
+
+Build the documentation site locally with:
+
+```bash
+pip install -e ".[docs]"
+python -m mkdocs serve
+```
+
 ---
 
 ## Review Checklist
@@ -169,7 +188,7 @@ For a fast technical review:
 3. Read the intro and one or two theory chapters in `docs/`.
 4. Inspect the NumPy-first implementations in `src/quantum_ed/`.
 5. Open one notebook or run a demo from `demos/`.
-6. Compare the Bell-state and first-algorithm implementations in `src/showcase/`.
+6. Compare equivalent implementations through the experiment index in `experiments/`.
 
 ---
 

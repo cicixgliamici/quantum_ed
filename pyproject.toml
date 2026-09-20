@@ -12,16 +12,19 @@ dependencies = ["numpy", "scipy", "matplotlib"]
 
 [project.optional-dependencies]
 dev = ["pytest>=8", "jupyterlab", "ipykernel"]
+notebooks = ["nbconvert>=7", "ipykernel"]
+docs = ["mkdocs-material>=9"]
 # Qiskit is optional so the NumPy-first core remains lightweight.
 showcase = ["qiskit>=2.0"]
+openqasm = ["qiskit[qasm3-import]>=2.0"]
+qsharp = ["qdk>=1.28"]
+pennylane = ["pennylane>=0.45,<0.46"]
 
 [tool.setuptools]
 package-dir = {"" = "src"}
 
 [tool.setuptools.packages.find]
 where = ["src"]
-# Showcase files are runnable portfolio examples, not importable library code.
-exclude = ["showcase*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

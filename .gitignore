@@ -5,6 +5,7 @@ __pycache__/
 # Build and packaging artifacts
 build/
 dist/
+site/
 *.egg-info/
 .eggs/
 pip-wheel-metadata/

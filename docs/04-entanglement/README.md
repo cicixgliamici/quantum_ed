@@ -154,7 +154,15 @@ Why does entanglement force us to think about subsystems differently from classi
 
 - `../../notebooks/02-bell-entanglement.ipynb`
 
+## Protocols and experiments
+
+- [Bell-state experiment](https://github.com/cicixgliamici/quantum_ed/tree/main/experiments/bell-state)
+- [Superdense-coding theory](superdense-coding.md)
+- [Superdense-coding experiment](https://github.com/cicixgliamici/quantum_ed/tree/main/experiments/superdense-coding)
+- [Quantum-teleportation theory](quantum-teleportation.md)
+- [Quantum-teleportation experiment](https://github.com/cicixgliamici/quantum_ed/tree/main/experiments/quantum-teleportation)
+
 ## Next
 
-- `docs/07-density-matrices/README.md`
-- `docs/06-noise-and-channels/README.md`
+- `docs/06-density-matrices/README.md`
+- `docs/07-noise-and-channels/README.md`

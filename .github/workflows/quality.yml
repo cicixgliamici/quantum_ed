@@ -1,0 +1,127 @@
+name: Quality
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  core:
+    name: Core Python and repository contracts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install core development dependencies
+        run: python -m pip install -e ".[dev]"
+      - name: Validate repository structure and links
+        run: python tools/verify_repository.py
+      - name: Execute NumPy experiment entrypoints
+        run: python tools/validate_numpy.py
+      - name: Run core tests
+        run: python -m pytest -q
+
+  qiskit:
+    name: Qiskit experiments
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install Qiskit and test dependencies
+        run: python -m pip install -e ".[dev,showcase]"
+      - name: Test Qiskit experiment behavior
+        run: python -m pytest -q tests/experiments
+      - name: Execute Qiskit entrypoints
+        shell: bash
+        run: |
+          find experiments -path "*/qiskit/*.py" -print0 |
+            sort -z |
+            xargs -0 -n1 python
+
+  openqasm:
+    name: OpenQASM 3 syntax
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install the OpenQASM reference importer
+        run: python -m pip install -e ".[openqasm]"
+      - name: Parse declared OpenQASM programs
+        run: python tools/validate_openqasm.py
+
+  qsharp:
+    name: Q# compilation
+    runs-on: ubuntu-latest
+    env:
+      QDK_PYTHON_TELEMETRY: none
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install the Microsoft QDK
+        run: python -m pip install -e ".[qsharp]"
+      - name: Compile declared Q# programs
+        run: python tools/validate_qsharp.py
+
+  notebooks:
+    name: Reproducible notebooks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install notebook dependencies
+        run: python -m pip install -e ".[notebooks]"
+      - name: Execute clean notebook copies
+        run: |
+          mkdir -p /tmp/quantum-ed-notebooks
+          python -m jupyter nbconvert --to notebook --execute notebooks/*.ipynb \
+            --output-dir /tmp/quantum-ed-notebooks \
+            --ExecutePreprocessor.timeout=120
+
+  documentation:
+    name: Documentation site
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install documentation dependencies
+        run: python -m pip install -e ".[docs]"
+      - name: Build the documentation site
+        run: python -m mkdocs build --strict
+
+  pennylane:
+    name: PennyLane experiments and noise study
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install PennyLane and test dependencies
+        run: python -m pip install -e ".[dev,pennylane]"
+      - name: Execute PennyLane entrypoints
+        run: python tools/validate_pennylane.py
+      - name: Compare ideal and noisy models
+        run: python studies/ideal-vs-noisy/pennylane_model.py
+      - name: Run ecosystem tests
+        run: python -m pytest -q tests/experiments

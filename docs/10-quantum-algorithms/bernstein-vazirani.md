@@ -68,9 +68,10 @@ $$
 The oracle applies controlled-X gates from input qubits 0 and 2 to the output
 qubit. A measurement returns `101` with ideal probability 1.
 
-- [Qiskit](../../src/showcase/qiskit/bernstein_vazirani.py)
-- [Q#](../../src/showcase/qsharp/BernsteinVazirani.qs)
-- [OpenQASM 3](../../src/showcase/openqasm/bernstein_vazirani.qasm)
+- [Experiment guide](https://github.com/cicixgliamici/quantum_ed/tree/main/experiments/bernstein-vazirani)
+- [Qiskit](https://github.com/cicixgliamici/quantum_ed/blob/main/experiments/bernstein-vazirani/qiskit/bernstein_vazirani.py)
+- [Q#](https://github.com/cicixgliamici/quantum_ed/blob/main/experiments/bernstein-vazirani/qsharp/BernsteinVazirani.qs)
+- [OpenQASM 3](https://github.com/cicixgliamici/quantum_ed/blob/main/experiments/bernstein-vazirani/openqasm/bernstein_vazirani.qasm)
 
 ## Relationship to Deutsch-Jozsa
 

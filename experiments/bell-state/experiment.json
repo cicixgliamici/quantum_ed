@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "name": "bell-state",
+  "category": "entanglement",
+  "theory": "docs/04-entanglement/README.md",
+  "expected_result": "Only 00 and 11 occur, with equal ideal probabilities.",
+  "implementations": {
+    "numpy": "experiments/bell-state/numpy/bell_state.py",
+    "qiskit": "experiments/bell-state/qiskit/bell_state.py",
+    "qsharp": "experiments/bell-state/qsharp/BellState.qs",
+    "openqasm": "experiments/bell-state/openqasm/bell_state.qasm",
+    "pennylane": "experiments/bell-state/pennylane/bell_state.py"
+  }
+}

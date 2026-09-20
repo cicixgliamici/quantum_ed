@@ -189,5 +189,5 @@ That is why the study of quantum computing naturally connects:
 
 ## Next
 
-- `docs/06-noise-and-channels/README.md`
-- `docs/07-density-matrices/README.md`
+- `docs/07-noise-and-channels/README.md`
+- `docs/06-density-matrices/README.md`

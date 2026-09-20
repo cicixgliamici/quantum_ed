@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "name": "variational-quantum-eigensolver",
+  "category": "variational-algorithm",
+  "theory": "docs/10-quantum-algorithms/variational-quantum-eigensolver.md",
+  "expected_result": "The RY ansatz converges to theta pi and ground-state energy -1 for Hamiltonian Z.",
+  "implementations": {
+    "numpy": "experiments/variational-quantum-eigensolver/numpy/vqe.py",
+    "qiskit": "experiments/variational-quantum-eigensolver/qiskit/vqe.py",
+    "qsharp": "experiments/variational-quantum-eigensolver/qsharp/VQEAnsatz.qs",
+    "openqasm": "experiments/variational-quantum-eigensolver/openqasm/vqe_ansatz.qasm",
+    "pennylane": "experiments/variational-quantum-eigensolver/pennylane/vqe.py"
+  }
+}

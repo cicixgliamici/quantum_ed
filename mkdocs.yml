@@ -1,0 +1,56 @@
+site_name: Quantum-Ed
+site_description: Quantum theory connected to executable programming ecosystems
+repo_name: quantum-ed
+repo_url: https://github.com/cicixgliamici/quantum_ed
+docs_dir: docs
+
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.top
+    - content.code.copy
+
+markdown_extensions:
+  - attr_list
+  - md_in_html
+  - pymdownx.arithmatex:
+      generic: true
+
+extra_javascript:
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
+nav:
+  - Home: index.md
+  - Foundations:
+      - Introduction: 00-intro/README.md
+      - Linear algebra: 01-linear-algebra/README.md
+      - Qubits and states: 02-qubits-and-states/README.md
+      - Measurement: 03-measurement/README.md
+  - Quantum information:
+      - Entanglement: 04-entanglement/README.md
+      - CHSH inequality: 04-entanglement/CHSH.md
+      - Superdense coding: 04-entanglement/superdense-coding.md
+      - Quantum teleportation: 04-entanglement/quantum-teleportation.md
+      - Density matrices: 06-density-matrices/README.md
+      - Noise and channels: 07-noise-and-channels/README.md
+      - Fidelity and trace distance: 07-noise-and-channels/FIDELITY.md
+      - Ideal versus noisy: 07-noise-and-channels/ideal-vs-noisy.md
+  - Computing:
+      - Circuits and gates: 05-circuits-and-gates/README.md
+      - Exercise solutions: 05-circuits-and-gates/solutions.md
+      - Quantum algorithms: 10-quantum-algorithms/README.md
+      - Deutsch-Jozsa: 10-quantum-algorithms/deutsch-jozsa.md
+      - Bernstein-Vazirani: 10-quantum-algorithms/bernstein-vazirani.md
+      - Grover search: 10-quantum-algorithms/grover-search.md
+      - Quantum Fourier transform: 10-quantum-algorithms/quantum-fourier-transform.md
+      - Quantum phase estimation: 10-quantum-algorithms/quantum-phase-estimation.md
+      - Variational quantum eigensolver: 10-quantum-algorithms/variational-quantum-eigensolver.md
+      - Ecosystem comparison: 10-quantum-algorithms/language-comparison.md
+  - Hardware: 08-hardware/README.md
+  - Experiments: experiments.md
+  - Exercises: exercises.md
+  - Reference:
+      - Index: reference/README.md
+      - Useful matrices: 09-useful-matrices/README.md
+      - Bit ordering: reference/bit-ordering.md

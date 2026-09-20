@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "name": "quantum-fourier-transform",
+  "category": "algorithmic-primitive",
+  "theory": "docs/10-quantum-algorithms/quantum-fourier-transform.md",
+  "expected_result": "The QFT of basis state 001 has uniform measurement probabilities and phase-encoded input information.",
+  "implementations": {
+    "numpy": "experiments/quantum-fourier-transform/numpy/quantum_fourier_transform.py",
+    "qiskit": "experiments/quantum-fourier-transform/qiskit/quantum_fourier_transform.py",
+    "qsharp": "experiments/quantum-fourier-transform/qsharp/QuantumFourierTransform.qs",
+    "openqasm": "experiments/quantum-fourier-transform/openqasm/quantum_fourier_transform.qasm",
+    "pennylane": "experiments/quantum-fourier-transform/pennylane/quantum_fourier_transform.py"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "name": "deutsch-jozsa",
+  "category": "query-algorithm",
+  "theory": "docs/10-quantum-algorithms/deutsch-jozsa.md",
+  "expected_result": "The selected oracle is classified as balanced.",
+  "implementations": {
+    "numpy": "experiments/deutsch-jozsa/numpy/deutsch_jozsa.py",
+    "qiskit": "experiments/deutsch-jozsa/qiskit/deutsch_jozsa.py",
+    "qsharp": "experiments/deutsch-jozsa/qsharp/DeutschJozsa.qs",
+    "openqasm": "experiments/deutsch-jozsa/openqasm/deutsch_jozsa.qasm",
+    "pennylane": "experiments/deutsch-jozsa/pennylane/deutsch_jozsa.py"
+  }
+}

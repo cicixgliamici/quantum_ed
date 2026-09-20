@@ -1,5 +1,9 @@
 # Implementation comparison: Qiskit, Q#, and OpenQASM 3
 
+The runnable sources are grouped by concept in the
+[experiment index](https://github.com/cicixgliamici/quantum_ed/tree/main/experiments). For comparisons involving
+measurement strings, first read the [bit-ordering reference](../reference/bit-ordering.md).
+
 The three showcase implementations describe the same circuits at different
 levels of abstraction. This comparison focuses on the concepts visible in the
 Deutsch-Jozsa and Bernstein-Vazirani examples.
@@ -25,7 +29,7 @@ most directly.
 | Allocate classical results | Part of `QuantumCircuit(4, 3)` | Return type `Result[]` | `bit[3] results;` |
 | Apply Hadamard to a register | `circuit.h(range(3))` | `for input in inputs { H(input); }` | `h inputs;` |
 | Apply controlled-X | `circuit.cx(0, 3)` | `CNOT(inputs[0], output);` | `cx inputs[0], output;` |
-| Measure inputs | `circuit.measure(...)` | `MResetEach(inputs)` | `results = measure inputs;` |
+| Measure inputs | `circuit.measure(...)` | `MResetEachZ(inputs)` | `results = measure inputs;` |
 | Execute locally | `StatevectorSampler` | QDK simulator | Provider/tool dependent |
 | Process counts | Python dictionary | Host or returned results | Outside this circuit file |
 
@@ -57,7 +61,7 @@ Q# makes allocation and cleanup part of the program:
 use inputs = Qubit[3];
 use output = Qubit();
 // ...
-let results = MResetEach(inputs);
+let results = MResetEachZ(inputs);
 Reset(output);
 ```
 
@@ -76,7 +80,7 @@ machinery:
 
 ```qasm
 qubit[3] inputs;
-qubit output;
+qubit ancilla;
 bit[3] results;
 
 h inputs;

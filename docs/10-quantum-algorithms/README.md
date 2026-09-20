@@ -1,10 +1,17 @@
-# First quantum algorithms
+# Quantum algorithms
 
-This chapter introduces two early quantum query algorithms:
+This chapter starts with two early quantum query algorithms:
 
 1. [Deutsch-Jozsa](deutsch-jozsa.md) decides whether a promised Boolean
    function is constant or balanced.
 2. [Bernstein-Vazirani](bernstein-vazirani.md) recovers a hidden bit string.
+
+It then extends the path toward:
+
+3. [Grover search](grover-search.md) and amplitude amplification.
+4. The [quantum Fourier transform](quantum-fourier-transform.md).
+5. [Quantum phase estimation](quantum-phase-estimation.md).
+6. The hybrid [variational quantum eigensolver](variational-quantum-eigensolver.md).
 
 They are useful teaching examples because both expose the same core ideas:
 
@@ -14,8 +21,8 @@ They are useful teaching examples because both expose the same core ideas:
 - interference turns those phases into a measurable answer.
 
 The implementations use the same small instances in
-[`src/showcase`](../../src/showcase/README.md), making the Qiskit, Q#, and
-OpenQASM 3 versions directly comparable.
+[`experiments`](https://github.com/cicixgliamici/quantum_ed/tree/main/experiments),
+making NumPy, Qiskit, Q#, OpenQASM 3, and PennyLane directly comparable.
 
 See the dedicated
 [language and implementation comparison](language-comparison.md) for a

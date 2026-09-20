@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "name": "quantum-teleportation",
+  "category": "communication",
+  "theory": "docs/04-entanglement/quantum-teleportation.md",
+  "expected_result": "Bob's target qubit is measured as 1 deterministically.",
+  "implementations": {
+    "numpy": "experiments/quantum-teleportation/numpy/quantum_teleportation.py",
+    "qiskit": "experiments/quantum-teleportation/qiskit/quantum_teleportation.py",
+    "qsharp": "experiments/quantum-teleportation/qsharp/QuantumTeleportation.qs",
+    "openqasm": "experiments/quantum-teleportation/openqasm/quantum_teleportation.qasm",
+    "pennylane": "experiments/quantum-teleportation/pennylane/quantum_teleportation.py"
+  }
+}
