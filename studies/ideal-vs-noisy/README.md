@@ -1,8 +1,10 @@
 # Ideal versus noisy simulation
 
-This study prepares $|0\rangle$ and applies bit-flip noise
+This study prepares $|0\rangle$ and applies bit-flip noise:
 
-$$\mathcal{E}(\rho)=(1-p)\rho+pX\rho X.$$
+$$
+\mathcal{E}(\rho)=(1-p)\rho+pX\rho X.
+$$
 
 The ideal case $p=0$ always measures zero. Under noise, the probability of
 measuring one is exactly $p$.

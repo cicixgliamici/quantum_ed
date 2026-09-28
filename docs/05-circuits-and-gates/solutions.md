@@ -50,8 +50,7 @@ X^2 =
 1 & 0 \\
 0 & 1
 \end{bmatrix}
-=
-I
+= I
 $$
 
 So:
@@ -125,8 +124,7 @@ H|0\rangle =
 1 \\
 1
 \end{bmatrix}
-=
-\frac{|0\rangle + |1\rangle}{\sqrt{2}}
+= \frac{|0\rangle + |1\rangle}{\sqrt{2}}
 $$
 
 Now compute:
@@ -153,8 +151,7 @@ H|1\rangle =
 1 \\
 -1
 \end{bmatrix}
-=
-\frac{|0\rangle - |1\rangle}{\sqrt{2}}
+= \frac{|0\rangle - |1\rangle}{\sqrt{2}}
 $$
 
 Python verification:
@@ -203,9 +200,7 @@ $$
 So:
 
 $$
-(H \otimes I)|00\rangle
-=
-\frac{|00\rangle + |10\rangle}{\sqrt{2}}
+(H \otimes I)|00\rangle = \frac{|00\rangle + |10\rangle}{\sqrt{2}}
 $$
 
 Now apply CNOT, where the first qubit is the control and the second qubit is the target.
@@ -225,9 +220,7 @@ $$
 Therefore:
 
 $$
-\mathrm{CNOT}(H \otimes I)|00\rangle
-=
-\frac{|00\rangle + |11\rangle}{\sqrt{2}}
+\mathrm{CNOT}(H \otimes I)|00\rangle = \frac{|00\rangle + |11\rangle}{\sqrt{2}}
 $$
 
 This is the Bell state:
@@ -377,8 +370,7 @@ R_x(0) =
 1 & 0 \\
 0 & 1
 \end{bmatrix}
-=
-I
+= I
 $$
 
 Also:
@@ -389,8 +381,7 @@ R_y(0) =
 1 & 0 \\
 0 & 1
 \end{bmatrix}
-=
-I
+= I
 $$
 
 For $R_z$:
@@ -413,8 +404,7 @@ R_z(0) =
 1 & 0 \\
 0 & 1
 \end{bmatrix}
-=
-I
+= I
 $$
 
 Thus:

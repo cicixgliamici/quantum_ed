@@ -57,9 +57,7 @@ $$
 we get:
 
 $$
-\langle \psi' | \psi' \rangle
-=
-\langle \psi | U^\dagger U | \psi \rangle
+\langle \psi' | \psi' \rangle = \langle \psi | U^\dagger U | \psi \rangle
 $$
 
 So the condition for norm preservation is:
@@ -548,9 +546,7 @@ $$
 then the final state is:
 
 $$
-|\psi_{\mathrm{final}}\rangle
-=
-U_3 U_2 U_1 |\psi_0\rangle
+|\psi_{\mathrm{final}}\rangle = U_3 U_2 U_1 |\psi_0\rangle
 $$
 
 The order matters: the first gate applied to the state appears closest to the state vector.
@@ -587,17 +583,13 @@ $$
 Apply `H` to the first qubit:
 
 $$
-(H \otimes I)|00\rangle
-=
-\frac{|00\rangle + |10\rangle}{\sqrt{2}}
+(H \otimes I)|00\rangle = \frac{|00\rangle + |10\rangle}{\sqrt{2}}
 $$
 
 Then apply `CNOT`:
 
 $$
-\mathrm{CNOT}(H \otimes I)|00\rangle
-=
-\frac{|00\rangle + |11\rangle}{\sqrt{2}}
+\mathrm{CNOT}(H \otimes I)|00\rangle = \frac{|00\rangle + |11\rangle}{\sqrt{2}}
 $$
 
 In code:

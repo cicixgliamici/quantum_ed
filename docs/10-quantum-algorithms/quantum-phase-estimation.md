@@ -56,21 +56,26 @@ $$
 Measuring the $m$ counting qubits in the computational basis yields a bit string representing $2^m \theta$:
 
 - **Exact case:** If $\theta$ can be expressed exactly as an $m$-bit binary fraction:
-  
-  $$\theta = 0.\theta_1 \theta_2 \dots \theta_m = \sum_{j=1}^m \theta_j 2^{-j},$$
-  
-  the measurement returns the exact integer $2^m \theta$ with probability $1$.
+
+    $$
+    \theta = 0.\theta_1 \theta_2 \dots \theta_m = \sum_{j=1}^m \theta_j 2^{-j},
+    $$
+
+    the measurement returns the exact integer $2^m \theta$ with probability $1$.
 - **Approximate case:** If $\theta$ cannot be represented exactly in $m$ bits, the measurement distribution peaks sharply at the closest $m$-bit approximations, yielding the nearest binary fraction with probability at least $4/\pi^2 \approx 0.405$. Adding $t = O(\log(1/\epsilon))$ extra ancilla qubits boosts the success probability to $1 - \epsilon$.
 
 ## Repository example
 
 The repository implements a 4-qubit instance:
+
 - **Target register (1 qubit):** prepared in $|\psi\rangle = |1\rangle$ using an $X$ gate.
 - **Unitary operator:** the single-qubit $T$ gate:
-  
-  $$T = \begin{pmatrix} 1 & 0 \\ 0 & e^{i\pi/4} \end{pmatrix}.$$
-  
-  Its action on $|1\rangle$ is $T|1\rangle = e^{i\pi/4}|1\rangle = e^{2\pi i (1/8)}|1\rangle$, so the phase is $\theta = 1/8 = 0.125$.
+
+    $$
+    T = \begin{pmatrix} 1 & 0 \\ 0 & e^{i\pi/4} \end{pmatrix}.
+    $$
+
+    Its action on $|1\rangle$ is $T|1\rangle = e^{i\pi/4}|1\rangle = e^{2\pi i (1/8)}|1\rangle$, so the phase is $\theta = 1/8 = 0.125$.
 - **Counting register (3 qubits):** $m = 3$ qubits provide $2^3 = 8$ discrete bins.
   The exact binary representation is $\theta = 0.001_2$, so $2^3 \theta = 1$.
 - **Controlled powers:**

@@ -12,14 +12,19 @@ After measuring, the state collapses to the corresponding basis vector.
 ## Measurement operators
 
 Projectors:
+
 $$
 P_0 = |0\rangle\langle 0|,\quad P_1 = |1\rangle\langle 1|
 $$
+
 Probability:
+
 $$
 p(i)=\langle \psi|P_i|\psi\rangle
 $$
+
 Post-measurement state:
+
 $$
 |\psi'\rangle = \frac{P_i|\psi\rangle}{\sqrt{p(i)}}
 $$

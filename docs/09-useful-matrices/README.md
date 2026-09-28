@@ -302,9 +302,7 @@ $$
 The Hadamard gate is often used before an entangling gate such as `CNOT` to create Bell states:
 
 $$
-\mathrm{CNOT}(H \otimes I)|00\rangle
-=
-\frac{|00\rangle + |11\rangle}{\sqrt{2}}
+\mathrm{CNOT}(H \otimes I)|00\rangle = \frac{|00\rangle + |11\rangle}{\sqrt{2}}
 $$
 
 In code:
@@ -524,9 +522,7 @@ $$
 CNOT is a key entangling gate:
 
 $$
-\mathrm{CNOT}(H \otimes I)|00\rangle
-=
-\frac{|00\rangle + |11\rangle}{\sqrt{2}}
+\mathrm{CNOT}(H \otimes I)|00\rangle = \frac{|00\rangle + |11\rangle}{\sqrt{2}}
 $$
 
 In code:
@@ -626,9 +622,7 @@ Measurement in the computational basis can be described using projectors.
 The projector onto $|0\rangle$ is:
 
 $$
-P_0 =
-|0\rangle\langle 0|
-=
+P_0 = |0\rangle\langle 0| =
 \begin{bmatrix}
 1 & 0 \\
 0 & 0
@@ -638,9 +632,7 @@ $$
 The projector onto $|1\rangle$ is:
 
 $$
-P_1 =
-|1\rangle\langle 1|
-=
+P_1 = |1\rangle\langle 1| =
 \begin{bmatrix}
 0 & 0 \\
 0 & 1
@@ -656,17 +648,11 @@ $$
 the measurement probabilities are:
 
 $$
-\Pr(0) =
-\langle \psi | P_0 | \psi \rangle
-=
-|\alpha|^2
+\Pr(0) = \langle \psi | P_0 | \psi \rangle = |\alpha|^2
 $$
 
 $$
-\Pr(1) =
-\langle \psi | P_1 | \psi \rangle
-=
-|\beta|^2
+\Pr(1) = \langle \psi | P_1 | \psi \rangle = |\beta|^2
 $$
 
 Projectors are Hermitian but generally not unitary. They satisfy:
@@ -692,8 +678,7 @@ $$
 For example:
 
 $$
-|0\rangle\langle 0|
-=
+|0\rangle\langle 0| =
 \begin{bmatrix}
 1 & 0 \\
 0 & 0
@@ -701,8 +686,7 @@ $$
 $$
 
 $$
-|1\rangle\langle 1|
-=
+|1\rangle\langle 1| =
 \begin{bmatrix}
 0 & 0 \\
 0 & 1
@@ -712,9 +696,7 @@ $$
 The maximally mixed one-qubit state is:
 
 $$
-\rho =
-\frac{1}{2}I
-=
+\rho = \frac{1}{2}I =
 \begin{bmatrix}
 1/2 & 0 \\
 0 & 1/2
@@ -748,16 +730,13 @@ $$
 Its density matrix is:
 
 $$
-\rho_{\Phi^+}
-=
-|\Phi^+\rangle\langle\Phi^+|
+\rho_{\Phi^+} = |\Phi^+\rangle\langle\Phi^+|
 $$
 
 Explicitly:
 
 $$
-\rho_{\Phi^+}
-=
+\rho_{\Phi^+} =
 \frac{1}{2}
 \begin{bmatrix}
 1 & 0 & 0 & 1 \\
@@ -834,15 +813,7 @@ $$
 A one-qubit depolarizing channel can be described using Pauli matrices:
 
 $$
-\rho_{\mathrm{out}}
-=
-(1-p)\rho
-+
-\frac{p}{3}X\rho X
-+
-\frac{p}{3}Y\rho Y
-+
-\frac{p}{3}Z\rho Z
+\rho_{\mathrm{out}} = (1-p)\rho + \frac{p}{3}X\rho X + \frac{p}{3}Y\rho Y + \frac{p}{3}Z\rho Z
 $$
 
 This shows why the Pauli matrices are not only gates, but also a natural basis for describing noise.

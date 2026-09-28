@@ -5,11 +5,15 @@ measures a Hamiltonian expectation; a classical optimizer updates the parameters
 
 The repository uses the smallest complete example:
 
-$$H=Z, \qquad |\psi(\theta)\rangle=R_Y(\theta)|0\rangle.$$
+$$
+H=Z, \qquad |\psi(\theta)\rangle=R_Y(\theta)|0\rangle.
+$$
 
-The cost is
+The cost is:
 
-$$E(\theta)=\langle\psi(\theta)|Z|\psi(\theta)\rangle=\cos\theta.$$
+$$
+E(\theta)=\langle\psi(\theta)|Z|\psi(\theta)\rangle=\cos\theta.
+$$
 
 Its minimum is $E(\pi)=-1$, corresponding to the ground state $|1\rangle$.
 The example is intentionally analytically solvable: reviewers can verify every
