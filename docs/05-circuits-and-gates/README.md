@@ -388,6 +388,29 @@ from quantum_ed.gates import H, I, kron_n
 op = kron_n(H, I)
 ```
 
+### Multi-Qubit Gate Embedding
+
+In an $n$-qubit quantum register, applying a single-qubit gate $U$ to qubit $k$ (with 0-indexed positions from left to right) while leaving all other qubits unchanged is represented mathematically by the tensor product:
+
+$$
+U^{(k)} = I^{\otimes k} \otimes U \otimes I^{\otimes (n - 1 - k)}
+$$
+
+For example, in a 3-qubit register ($n=3$):
+
+- Applying $X$ to qubit 0: $X \otimes I \otimes I$
+- Applying $H$ to qubit 1: $I \otimes H \otimes I$
+- Applying $Z$ to qubit 2: $I \otimes I \otimes Z$
+
+In this repository's NumPy architecture, you construct these operators using `kron_n`:
+
+```python
+from quantum_ed.gates import H, I, kron_n
+
+# Apply H to qubit 1 in a 3-qubit system:
+op_q1 = kron_n(I, H, I)  # 8x8 matrix operator
+```
+
 ---
 
 ## 8. Two-Qubit Gates
@@ -527,72 +550,221 @@ SWAP is useful when reasoning about qubit ordering and hardware connectivity.
 
 ---
 
-## 12. Circuit Composition
+## 12. General Controlled Gates and Circuit Identities
 
-A circuit is a sequence of gate applications.
-
-If a circuit applies gates:
+A two-qubit controlled gate applies an arbitrary single-qubit unitary $U$ to the target qubit if and only if the control qubit is in state $|1\rangle$. Mathematically, in block-diagonal matrix form:
 
 $$
-U_1,\ U_2,\ U_3
+C(U) = |0\rangle\langle 0| \otimes I + |1\rangle\langle 1| \otimes U = \begin{bmatrix} I & 0 \\ 0 & U \end{bmatrix}
 $$
 
-to an initial state:
+When $U = X$, we recover the standard $\mathrm{CNOT}$ gate:
 
 $$
-|\psi_0\rangle
+\mathrm{CNOT} = |0\rangle\langle 0| \otimes I + |1\rangle\langle 1| \otimes X
 $$
 
-then the final state is:
+When $U = Z$, we obtain the controlled-Z gate $\mathrm{CZ}$:
+
+$$
+\mathrm{CZ} = |0\rangle\langle 0| \otimes I + |1\rangle\langle 1| \otimes Z = |00\rangle\langle 00| + |01\rangle\langle 01| + |10\rangle\langle 10| - |11\rangle\langle 11|
+$$
+
+Notice that $\mathrm{CZ}$ is completely symmetric under exchange of control and target: it introduces a $(-1)$ phase factor only when both qubits are in state $|1\rangle$. Therefore, either qubit can be viewed as control or target.
+
+### Useful Circuit Equivalence Identities
+
+Several algebraic identities are fundamental for circuit optimization and hardware compilation:
+
+1. **Conjugation between $\mathrm{CNOT}$ and $\mathrm{CZ}$:**
+   Since $H X H = Z$ and $H Z H = X$, placing Hadamard gates on the target qubit converts $\mathrm{CZ}$ into $\mathrm{CNOT}$ and vice versa:
+
+$$
+\mathrm{CNOT}_{0\to 1} = (I \otimes H) \mathrm{CZ} (I \otimes H)
+$$
+
+2. **Reversing the Direction of CNOT:**
+   Surrounding both qubits of a $\mathrm{CNOT}$ with Hadamard gates reverses the control and target roles:
+
+$$
+\mathrm{CNOT}_{1\to 0} = (H \otimes H) \mathrm{CNOT}_{0\to 1} (H \otimes H)
+$$
+
+   This identity is widely used in quantum compilers when hardware coupling maps only support directional CNOTs.
+
+3. **SWAP Decomposition into 3 CNOTs:**
+   A two-qubit $\mathrm{SWAP}$ gate can be synthesized entirely from three alternating $\mathrm{CNOT}$ gates:
+
+$$
+\mathrm{SWAP} = \mathrm{CNOT}_{0\to 1}\ \mathrm{CNOT}_{1\to 0}\ \mathrm{CNOT}_{0\to 1}
+$$
+
+   In NumPy verification:
+
+```python
+import numpy as np
+from quantum_ed.gates import CNOT, H, I, SWAP, kron_n
+
+H2 = kron_n(H, H)
+cnot_rev = H2 @ CNOT @ H2  # CNOT with control=1, target=0
+swap_synth = CNOT @ cnot_rev @ CNOT
+
+assert np.allclose(swap_synth, SWAP)
+```
+
+---
+
+## 13. The Phase Kickback Phenomenon
+
+Phase kickback is the core engine behind quantum speedups in algorithms such as Deutsch-Jozsa, Bernstein-Vazirani, Grover search, and Quantum Phase Estimation (QPE).
+
+Suppose a controlled gate $C(U)$ is applied where the target qubit is prepared in an eigenstate $|u\rangle$ of $U$ with eigenvalue $e^{i\theta}$:
+
+$$
+U|u\rangle = e^{i\theta}|u\rangle
+$$
+
+Let the control qubit be in an arbitrary superposition $\alpha|0\rangle + \beta|1\rangle$. The action of $C(U)$ on the joint state is:
+
+$$
+C(U) [(\alpha|0\rangle + \beta|1\rangle) \otimes |u\rangle] = \alpha |0\rangle \otimes |u\rangle + \beta |1\rangle \otimes U|u\rangle
+$$
+
+$$
+= \alpha |0\rangle \otimes |u\rangle + \beta e^{i\theta} |1\rangle \otimes |u\rangle = (\alpha |0\rangle + \beta e^{i\theta}|1\rangle) \otimes |u\rangle
+$$
+
+**The key insight:** Even though the gate nominally targets the second qubit, the eigenvalue phase $e^{i\theta}$ is "kicked back" into the relative phase of the control qubit, leaving the target state $|u\rangle$ completely unchanged and unentangled.
+
+For a standard $\mathrm{CNOT}$, the target state $|-\rangle = \frac{|0\rangle - |1\rangle}{\sqrt{2}}$ is an eigenstate of $X$ with eigenvalue $(-1)$:
+
+$$
+X|-\rangle = -|-\rangle
+$$
+
+Applying $\mathrm{CNOT}$ with target $|-\rangle$ yields:
+
+$$
+\mathrm{CNOT}[(\alpha|0\rangle + \beta|1\rangle) \otimes |-\rangle] = (\alpha|0\rangle - \beta|1\rangle) \otimes |-\rangle
+$$
+
+The target qubit flipped the relative sign of the control qubit without changing its own state.
+
+---
+
+## 14. Circuit Composition & Temporal Ordering
+
+A quantum circuit represents a sequence of gate applications over time. When translating a circuit diagram into matrix algebra:
+
+1. **Left-to-right in circuit diagrams = Right-to-left in matrix multiplication:**
+   If a circuit applies gate $U_1$, then $U_2$, then $U_3$ to initial state $|\psi_0\rangle$:
+
+   ```text
+   |ψ₀⟩ ---[ U₁ ]---[ U₂ ]---[ U₃ ]---> |ψ_final⟩
+   ```
+
+   The final state vector is:
 
 $$
 |\psi_{\mathrm{final}}\rangle = U_3 U_2 U_1 |\psi_0\rangle
 $$
 
-The order matters: the first gate applied to the state appears closest to the state vector.
+   The operator acting first appears adjacent to the ket $|\psi_0\rangle$.
 
-In code:
+2. **Sequential application in code:**
 
-```python
-from quantum_ed.gates import apply
+   ```python
+   from quantum_ed.gates import apply
 
-state = apply(U1, state)
-state = apply(U2, state)
-state = apply(U3, state)
-```
+   state = apply(U1, state)
+   state = apply(U2, state)
+   state = apply(U3, state)
+   ```
 
-This explicit style is useful for education because it makes the matrix multiplication order visible.
+3. **Circuit Depth and Parallelism:**
+   Gates that act on disjoint sets of qubits commute and can be executed simultaneously in the same time step (layer). The **depth** of a circuit is the number of discrete time steps required to execute all layers, which dictates how long qubits must retain their coherence.
 
 ---
 
-## 13. Bell-State Circuit
+## 15. Single-Qubit Euler ($ZYZ$) Decomposition & Universality
 
-A simple example is the creation of the Bell state:
+### Euler Angle ($ZYZ$) Decomposition
 
-$$
-|\Phi^+\rangle =
-\frac{|00\rangle + |11\rangle}{\sqrt{2}}
-$$
-
-Start with:
+Any arbitrary single-qubit unitary $U \in U(2)$ can be parameterized by four real angles $(\alpha, \beta, \gamma, \delta)$ as a sequence of rotations about the $Z$ and $Y$ axes:
 
 $$
-|00\rangle
+U = e^{i\alpha} R_z(\beta) R_y(\gamma) R_z(\delta)
 $$
 
-Apply `H` to the first qubit:
+Because $R_z$ and $R_y$ rotate around orthogonal axes on the Bloch sphere, any orientation can be reached by:
+1. Rotating around the $Z$-axis by $\delta$
+2. Rotating around the $Y$-axis by $\gamma$
+3. Rotating around the $Z$-axis by $\beta$
+4. Adding an overall global phase $e^{i\alpha}$
+
+This is the standard decomposition used by hardware transpilers (e.g. Qiskit's `U3` or `RZ-SX-RZ` decomposition) to implement arbitrary single-qubit gates on physical hardware.
+
+### Quantum Universality
+
+A set of quantum gates is called **universal** if any unitary operation on any number of qubits can be approximated to arbitrary accuracy by a circuit composed entirely of gates from that set.
+
+- **Exact Universality (Barenco et al., 1995):**
+  The set of all single-qubit gates together with the two-qubit $\mathrm{CNOT}$ gate is universal for quantum computation. Any $n$-qubit unitary can be decomposed into single-qubit rotations and CNOTs.
+
+- **The Clifford Group and Gottesman-Knill Theorem:**
+  The Clifford group $\mathcal{C}_n$ is the group of unitaries that map the Pauli group back into itself under conjugation:
 
 $$
-(H \otimes I)|00\rangle = \frac{|00\rangle + |10\rangle}{\sqrt{2}}
+U \mathcal{P}_n U^\dagger = \mathcal{P}_n
 $$
 
-Then apply `CNOT`:
+  The Clifford group is generated by $\{H, S, \mathrm{CNOT}\}$. While Clifford gates generate superposition, entanglement, and teleportation, the **Gottesman-Knill Theorem** proves that any circuit composed solely of:
+  1. Preparation of computational basis states $|0\dots 0\rangle$
+  2. Clifford gates ($H, S, \mathrm{CNOT}$)
+  3. Measurement of Pauli observables ($Z$)
+  can be **simulated efficiently on a classical computer in polynomial time $O(n^2)$** using stabilizer tableaus.
+
+- **Fault-Tolerant Universality (Clifford + $T$):**
+  To achieve quantum computational advantage, we must include a non-Clifford gate. The standard choice is the $T$ gate ($\pi/8$ gate):
 
 $$
-\mathrm{CNOT}(H \otimes I)|00\rangle = \frac{|00\rangle + |11\rangle}{\sqrt{2}}
+T = \begin{bmatrix} 1 & 0 \\ 0 & e^{i\pi/4} \end{bmatrix}
 $$
 
-In code:
+  The set $\{H, S, \mathrm{CNOT}, T\}$ forms a universal gate set for quantum computing.
+
+- **The Solovay-Kitaev Theorem:**
+  The Solovay-Kitaev theorem guarantees that any arbitrary single-qubit gate can be approximated to within precision $\epsilon > 0$ using a sequence of only $O(\log^c(1/\epsilon))$ gates from a discrete universal set (such as Clifford + $T$), where $c \approx 1$ to $2$. This logarithmic scaling makes fault-tolerant compilation practical.
+
+---
+
+## 16. Bell-State Circuit
+
+A canonical two-qubit example is creating the maximally entangled Bell state:
+
+$$
+|\Phi^+\rangle = \frac{|00\rangle + |11\rangle}{\sqrt{2}}
+$$
+
+1. Prepare $|00\rangle$:
+
+$$
+|\psi_0\rangle = |00\rangle
+$$
+
+2. Apply Hadamard to qubit 0 to create an equal superposition:
+
+$$
+|\psi_1\rangle = (H \otimes I)|00\rangle = \frac{|0\rangle + |1\rangle}{\sqrt{2}} \otimes |0\rangle = \frac{|00\rangle + |10\rangle}{\sqrt{2}}
+$$
+
+3. Apply $\mathrm{CNOT}$ (control=0, target=1). When qubit 0 is $|0\rangle$, qubit 1 remains $|0\rangle$. When qubit 0 is $|1\rangle$, qubit 1 flips to $|1\rangle$:
+
+$$
+|\psi_2\rangle = \mathrm{CNOT}|\psi_1\rangle = \frac{|00\rangle + |11\rangle}{\sqrt{2}}
+$$
+
+In Python:
 
 ```python
 from quantum_ed.gates import CNOT, H, I, apply, kron_n
@@ -603,21 +775,17 @@ state = apply(kron_n(H, I), state)
 state = apply(CNOT, state)
 ```
 
-This exact behavior is validated in the tests.
-
 ---
 
-## 14. Code Connection
+## 17. Code Connection
 
 The main code for this chapter is located in:
 
-```text
-src/quantum_ed/gates.py
-src/quantum_ed/linalg.py
-src/quantum_ed/states.py
-```
+- [`src/quantum_ed/gates.py`](file:///c:/Progetti/quantum_ed/src/quantum_ed/gates.py)
+- [`src/quantum_ed/linalg.py`](file:///c:/Progetti/quantum_ed/src/quantum_ed/linalg.py)
+- [`src/quantum_ed/states.py`](file:///c:/Progetti/quantum_ed/src/quantum_ed/states.py)
 
-Useful functions and constants include:
+Key gate definitions and functions:
 
 ```python
 from quantum_ed.gates import (
@@ -639,109 +807,65 @@ from quantum_ed.gates import (
 )
 ```
 
-The relevant tests are in:
-
-```text
-tests/test_gates.py
-tests/test_bell_states.py
-tests/test_linalg.py
-```
-
-Run them with:
+Run test suite:
 
 ```bash
-python -m pytest -q
+python -m pytest tests/test_gates.py tests/test_bell_states.py -q
 ```
 
 ---
 
-## 15. Exercises
+## 18. Exercises
 
-### Exercise 1
+Detailed solutions for Exercises 1–5 are available in [solutions.md](solutions.md).
 
-Show that:
+### Exercise 1 — Pauli Involutions
+Show analytically and verify with NumPy that:
 
 $$
-X^2 = I
+X^2 = I, \quad Y^2 = I, \quad Z^2 = I
 $$
 
-Then verify it with NumPy.
+### Exercise 2 — Hadamard Action
+Compute the explicit matrix-vector products $H|0\rangle$ and $H|1\rangle$ and express the results in terms of $|+\rangle$ and $|-\rangle$.
+
+### Exercise 3 — Entanglement Generation
+Starting from $|00\rangle$, apply $(H \otimes I)$ followed by $\mathrm{CNOT}$. Compute the resulting state vector and verify that it equals $|\Phi^+\rangle$.
+
+### Exercise 4 — SWAP Truth Table
+Verify analytically and numerically that $\mathrm{SWAP}|01\rangle = |10\rangle$ and $\mathrm{SWAP}|10\rangle = |01\rangle$.
+
+### Exercise 5 — Identity Limit of Rotations
+Demonstrate that $R_x(0) = R_y(0) = R_z(0) = I$.
+
+### Exercise 6 — CNOT Control/Target Inversion
+Prove that surrounding a $\mathrm{CNOT}$ with Hadamard gates on both qubits reverses its direction:
+
+$$
+(H \otimes H) \mathrm{CNOT}_{0\to 1} (H \otimes H) = \mathrm{CNOT}_{1\to 0}
+$$
+
+**Solution hint:** Write out the matrix product using $H \otimes H = \frac{1}{2} \begin{bmatrix} 1 & 1 & 1 & 1 \\ 1 & -1 & 1 & -1 \\ 1 & 1 & -1 & -1 \\ 1 & -1 & -1 & 1 \end{bmatrix}$ and compute $(H \otimes H)\mathrm{CNOT}(H \otimes H)$.
+
+### Exercise 7 — SWAP Synthesis
+Show that three alternating CNOT gates synthesize a SWAP gate:
+
+$$
+\mathrm{CNOT}_{0\to 1}\ \mathrm{CNOT}_{1\to 0}\ \mathrm{CNOT}_{0\to 1} = \mathrm{SWAP}
+$$
+
+**Solution hint:** Trace the evolution of computational basis kets $|a, b\rangle$:
+1. After first CNOT: $|a, a \oplus b\rangle$
+2. After second CNOT: $|a \oplus (a \oplus b), a \oplus b\rangle = |b, a \oplus b\rangle$
+3. After third CNOT: $|b, (a \oplus b) \oplus b\rangle = |b, a\rangle$
+Since $|a, b\rangle \mapsto |b, a\rangle$ for all $a, b \in \{0, 1\}$, the composite circuit equals $\mathrm{SWAP}$.
 
 ---
 
-### Exercise 2
+## 19. Next Steps
 
-Compute:
+After mastering unitary gates and circuit composition, continue with:
 
-$$
-H|0\rangle
-$$
-
-and:
-
-$$
-H|1\rangle
-$$
-
-Then verify the result using `quantum_ed.gates.H`.
-
----
-
-### Exercise 3
-
-Starting from $|00\rangle$, apply:
-
-$$
-H \otimes I
-$$
-
-then apply:
-
-$$
-\mathrm{CNOT}
-$$
-
-Verify that the result is:
-
-$$
-\frac{|00\rangle + |11\rangle}{\sqrt{2}}
-$$
-
----
-
-### Exercise 4
-
-Verify the truth table of `SWAP`:
-
-$$
-\mathrm{SWAP}|01\rangle = |10\rangle
-$$
-
-and:
-
-$$
-\mathrm{SWAP}|10\rangle = |01\rangle
-$$
-
----
-
-### Exercise 5
-
-Check numerically that:
-
-$$
-R_x(0) = R_y(0) = R_z(0) = I
-$$
-
----
-
-## 16. Next Steps
-
-After this chapter, the natural next topics are:
-
-- measurement in the computational basis
-- density matrices
-- partial trace
-- noise channels
-- simple circuit pipelines
-- comparison with frameworks such as Qiskit
+- [Density Matrices](../06-density-matrices/README.md) — generalizing to mixed states and open systems
+- [Noise & Channels](../07-noise-and-channels/README.md) — modeling decoherence and gate errors
+- [Quantum Algorithms](../10-quantum-algorithms/README.md) — synthesizing gates into oracles and quantum speedups
