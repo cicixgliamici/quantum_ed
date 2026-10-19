@@ -298,6 +298,12 @@ In classical mechanics, if you know the exact state of the whole engine, you kno
 
 To quantify the degree of mixture or quantum entanglement, we use the **von Neumann entropy**.
 
+Entropy quantifies mixedness of a state. Reduced-state entropy quantifies
+entanglement for a **pure joint bipartite state**, but is not a general
+mixed-state entanglement measure: a separable classical mixture can also have
+nonzero local entropy. For standard definitions see Chapters 2 and 5 of
+[Watrous (2018)](https://cs.uwaterloo.ca/~watrous/TQI/TQI.pdf).
+
 ### Definition
 
 For a density matrix $\rho$ with spectral decomposition $\rho = \sum_k \lambda_k |k\rangle\langle k|$:
@@ -382,11 +388,11 @@ $$
 
 ## 7. Python Implementation in `quantum_ed`
 
-The repository provides introductory density-matrix and subsystem tools in [`src/quantum_ed/density.py`](file:///c:/Progetti/quantum_ed/src/quantum_ed/density.py):
+The repository provides introductory density-matrix and subsystem tools in [`src/quantum_ed/density.py`](https://github.com/cicixgliamici/quantum_ed/blob/main/src/quantum_ed/density.py):
 
 ```python
 import numpy as np
-from quantum_ed.states import basis_0, basis_1, bell_phi_plus
+from quantum_ed.states import ket0, ket1, bell_phi_plus
 from quantum_ed.density import (
     rho_from_ket,
     fidelity_pure,
@@ -395,11 +401,11 @@ from quantum_ed.density import (
 )
 
 # 1. Construct pure state density matrices
-ket_plus = (basis_0() + basis_1()) / np.sqrt(2)
+ket_plus = (ket0() + ket1()) / np.sqrt(2)
 rho_plus = rho_from_ket(ket_plus)
 
 # 2. Construct mixed state (50/50 mixture)
-rho_mix = 0.5 * rho_from_ket(basis_0()) + 0.5 * rho_from_ket(basis_1())
+rho_mix = 0.5 * rho_from_ket(ket0()) + 0.5 * rho_from_ket(ket1())
 
 # 3. Check distinguishability via Trace Distance
 d = trace_distance(rho_plus, rho_mix)
@@ -415,7 +421,7 @@ print("Reduced state rho_A:\n", rho_A)
 # Output is [[0.5, 0.0], [0.0, 0.5]] (I/2)
 
 # Check fidelity with |0>
-f0 = fidelity_pure(basis_0(), rho_A)
+f0 = fidelity_pure(ket0(), rho_A)
 print(f"Fidelity <0|rho_A|0>: {f0:.4f}")  # 0.5000
 ```
 

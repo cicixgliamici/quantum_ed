@@ -24,12 +24,17 @@ def oracle_phases(secret: str) -> np.ndarray:
     )
 
 
-def recover_secret(secret: str = SECRET) -> str:
-    """Recover the secret from the final ideal measurement distribution."""
+def final_probabilities(secret: str = SECRET) -> np.ndarray:
+    """Expose the full distribution so validation cannot hide extra outcomes."""
     transform = hadamard_register(len(secret))
     zero_state = np.eye(2 ** len(secret), dtype=complex)[:, 0]
     final_state = transform @ (oracle_phases(secret) * (transform @ zero_state))
-    return f"{int(np.argmax(np.abs(final_state) ** 2)):0{len(secret)}b}"
+    return np.abs(final_state) ** 2
+
+
+def recover_secret(secret: str = SECRET) -> str:
+    """Recover the secret from the final ideal measurement distribution."""
+    return f"{int(np.argmax(final_probabilities(secret))):0{len(secret)}b}"
 
 
 def main() -> None:

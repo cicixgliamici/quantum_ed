@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 import sys
 from pathlib import Path
 from typing import Any
+from urllib.parse import unquote, urlsplit
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 EXPERIMENTS_ROOT = REPOSITORY_ROOT / "experiments"
@@ -97,6 +99,18 @@ def is_external_link(target: str) -> bool:
     return target.startswith(("http://", "https://", "mailto:", "#"))
 
 
+def repository_source_target(target: str) -> Path | None:
+    """Check links to this repository's main branch against the local checkout."""
+    parsed = urlsplit(target)
+    parts = parsed.path.strip("/").split("/")
+    if (parsed.netloc != "github.com" or len(parts) < 4
+            or parts[:2] != ["cicixgliamici", "quantum_ed"]
+            or parts[2] not in {"blob", "tree"} or parts[3] != "main"):
+        return None
+    # Query strings and line anchors do not change which source file must exist.
+    return REPOSITORY_ROOT / unquote("/".join(parts[4:]))
+
+
 def validate_markdown_links(path: Path) -> list[str]:
     """Return broken local links found in one Markdown document."""
     text = path.read_text(encoding="utf-8")
@@ -104,6 +118,12 @@ def validate_markdown_links(path: Path) -> list[str]:
 
     for match in MARKDOWN_LINK.finditer(text):
         target = match.group(1).strip()
+        source_target = repository_source_target(target)
+        if source_target is not None:
+            if not source_target.exists():
+                relative_document = path.relative_to(REPOSITORY_ROOT)
+                errors.append(f"{relative_document}: broken repository source link {target!r}")
+            continue
         if is_external_link(target):
             continue
 
@@ -113,6 +133,19 @@ def validate_markdown_links(path: Path) -> list[str]:
             relative_document = path.relative_to(REPOSITORY_ROOT)
             errors.append(f"{relative_document}: broken link {target!r}")
     return errors
+
+
+def markdown_documents() -> list[Path]:
+    """Prune generated trees: installed third-party packages are not our docs."""
+    excluded = {".git", ".venv", "venv", "env", "build", "dist", "site",
+                "__pycache__", ".pytest_cache"}
+    documents = []
+    for parent, directories, filenames in os.walk(REPOSITORY_ROOT):
+        # Custom virtual environments are recognized even when their names differ.
+        directories[:] = [name for name in directories
+                          if name not in excluded and not (Path(parent) / name / "pyvenv.cfg").is_file()]
+        documents.extend(Path(parent) / name for name in filenames if name.endswith(".md"))
+    return sorted(documents)
 
 
 def collect_errors() -> list[str]:
@@ -125,9 +158,8 @@ def collect_errors() -> list[str]:
         errors.append("every experiment directory must contain experiment.json")
     for manifest in manifests:
         errors.extend(validate_manifest(manifest))
-    for document in REPOSITORY_ROOT.rglob("*.md"):
-        if ".git" not in document.parts and ".venv" not in document.parts:
-            errors.extend(validate_markdown_links(document))
+    for document in markdown_documents():
+        errors.extend(validate_markdown_links(document))
     return errors
 
 

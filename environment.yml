@@ -2,11 +2,8 @@ name: quantum-ed
 channels:
   - conda-forge
 dependencies:
-  - python=3.11
-  - numpy
-  - scipy
-  - matplotlib
-  - jupyterlab
-  - ipykernel
-  - pytest
+  # This is a convenience bootstrap, not a substitute for the universal lockfile.
+  - python=3.14.3
   - pip
+  - pip:
+      - -e .[dev]

@@ -1,218 +1,133 @@
-# Quantum-Ed - Quantum Computing, Information & Hardware
+# Quantum-Ed
 
-Quantum-Ed is an educational repository for learning quantum computing from first principles through a combination of:
+Quantum computing from explicit mathematics to verifiable simulations.
 
-- structured theory notes
-- runnable notebooks
-- small reusable Python modules
-- concept-first experiments across multiple quantum ecosystems
-- tests that validate the underlying mathematics
+Quantum-Ed combines a small NumPy toolkit, structured theory, seven notebooks,
+and nine experiments expressed in NumPy, Qiskit, PennyLane, Q#, and OpenQASM 3.
+Its central question is whether the code reproduces the mathematical claim:
+including relative phases, bit order, mixed states, and numerical tolerances.
 
-The goal of the repository is not just to collect notes, but to build a rigorous and inspectable learning path from basic linear algebra to circuits, measurement, entanglement, density matrices, noise, and hardware-aware reasoning.
+Start with the [ten-minute reviewer guide](docs/reviewer-guide.md), the
+[Bell-pair noise study](studies/bell_noise/README.md), or the
+[experiment index](experiments/README.md).
 
----
+## A complete study: what survives when a Bell pair becomes noisy?
 
-## Why This Repository Matters
+The [study report](docs/07-noise-and-channels/bell-noise-study.md) compares
+independent NumPy and PennyLane implementations of three local noise channels.
+It checks 606 density matrices against analytical predictions and explains two
+observable effects: Z-basis probabilities can stay unchanged after entanglement
+is lost, and purity can return to one for a separable state.
 
-Many quantum-computing repositories jump immediately into frameworks or high-level APIs.
+![Bell-pair fidelity, entanglement, and purity under three local noise models](docs/assets/bell-noise/metrics.png)
 
-Quantum-Ed is designed differently:
+[CSV data](docs/assets/bell-noise/results.csv) and the
+[validation summary](docs/assets/bell-noise/summary.json) record the results,
+parameters, numerical discrepancies, and software versions. The figures are
+available as PNG and SVG and can be regenerated from source.
 
-- it emphasizes the mathematical foundations
-- it keeps core ideas transparent and inspectable
-- it uses code as a way to make theory testable
+## What is implemented
 
-This makes the repository useful both as a study resource and as a compact technical project showing:
+| Component | Concrete evidence |
+| --- | --- |
+| NumPy teaching toolkit | [States](src/quantum_ed/states.py), [gates](src/quantum_ed/gates.py), measurement, density matrices, and single-qubit noise channels |
+| Nine concept-first experiments | Bell states, superdense coding, teleportation, Deutsch-Jozsa, Bernstein-Vazirani, Grover, QFT, QPE, and a one-qubit VQE |
+| Scientific comparisons | [Shared analytical checks](tools/validate_experiments.py), full-state phase-sensitive checks for QFT/teleportation, and explicit sampling bounds |
+| Bell-noise investigation | [Derivations and interpretation](docs/07-noise-and-channels/bell-noise-study.md), independent models, validated data, and reproducible plots |
+| Learning material | [Theory chapters](docs/index.md), [seven notebooks](notebooks/README.md), and [three exercises](exercises/README.md) with executable solutions |
+| Automated verification | [Tests](tests/), repository/source-link checks, notebook execution, and strict documentation builds in [CI](.github/workflows/quality.yml) |
 
-- scientific computing structure
-- mathematical clarity
-- educational repository design
-- Qiskit, Q#, and OpenQASM 3 interoperability concepts
-- disciplined use of notebooks, code, and tests together
+## Run a first example
 
----
-
-## Repository Structure
-
-- `docs/` - structured theory chapters in Markdown
-- `notebooks/` - runnable Jupyter lessons and demonstrations
-- `src/quantum_ed/` - small Python modules for core concepts
-- `experiments/` - concept-first comparisons across five programming ecosystems
-- `exercises/` - property-driven prompts with executable reference solutions
-- `studies/` - focused comparisons for framework-specific capabilities
-- `demos/` - lightweight scripts for quick experiments
-- `tests/` - tests validating states, gates, measurement, entanglement, and noise-related behavior
-
----
-
-## Current Scope
-
-At the current stage, the repository is focused on a compact but solid foundation:
-
-- linear algebra refresh for quantum computing
-- qubits and state-vector representation
-- measurement basics
-- Bell states and introductory entanglement material
-- superdense coding as a first entanglement-assisted communication protocol
-- quantum teleportation in a portable deferred-measurement form
-- Grover search, the quantum Fourier transform, and a minimal VQE
-- PennyLane differentiable circuits and mixed-state simulation
-- introductory circuits and gates
-- density matrices, partial trace, and fidelity
-- simple one-qubit noise channels
-- first notes toward hardware constraints
-- first query algorithms: Deutsch-Jozsa and Bernstein-Vazirani
-
-The aim is to make these parts clear, runnable, and extensible rather than to cover every topic superficially.
-
----
-
-## What Is Implemented vs Planned
-
-Implemented today:
-
-- theory chapters for the current learning path in `docs/`
-- reusable NumPy-based utilities in `src/quantum_ed/`
-- side-by-side ecosystem examples grouped by concept in `experiments/`
-- notebooks for setup, Bloch sphere intuition, Bell states, noise, and CHSH
-- tests for the core math utilities and state transformations
-
-Planned future extensions include:
-
-- additional notebooks on noise and fidelity
-- more hardware-oriented sections
-- broader comparisons with established quantum ecosystems
-- more exercises and validation tests
-- broader coverage of quantum information and algorithmic examples
-
-This distinction helps reviewers understand current scope without reading roadmap items as missing deliverables.
-
----
-
-## Learning Path
-
-A good path through the repository is:
-
-1. Linear algebra refresh  
-   `docs/01-linear-algebra/README.md`
-2. Qubits and states  
-   `docs/02-qubits-and-states/README.md`
-3. Measurement  
-   `docs/03-measurement/README.md`
-4. Entanglement and Bell states  
-   `docs/04-entanglement/README.md`  
-   `notebooks/02-bell-entanglement.ipynb`
-5. Circuits and gates  
-   `docs/05-circuits-and-gates/README.md`
-6. Density matrices  
-   `docs/06-density-matrices/README.md`
-7. Noise and channels  
-   `docs/07-noise-and-channels/README.md`
-8. Hardware overview  
-   `docs/08-hardware/README.md`
-9. First quantum algorithms: `docs/10-quantum-algorithms/README.md`
-
----
-
-## Quick Reviewer Guide
-
-If you want to evaluate the repository quickly, the best path is:
-
-1. Read this README for the project goal and scope.
-2. Open `docs/00-intro/README.md` and then follow the learning path above.
-3. Inspect `src/quantum_ed/` to see the supporting Python code.
-4. Run `python -m pytest -q` after installation.
-5. Open `notebooks/02-bell-entanglement.ipynb` or `notebooks/03-noise-fidelity.ipynb`.
-
----
-
-## Philosophy
-
-The repository follows a simple principle:
-
-> understand the math first, then use tools with intention.
-
-That is why the project starts from small, explicit implementations and educational notes before relying heavily on external quantum ecosystems.
-
-The objective is not to compete with mature frameworks, but to make their underlying ideas easier to understand and reason about.
-
----
-
-## Getting Started
-
-### Option A - Conda
+The package requires Python 3.11 or newer. The locked reference environment
+uses CPython 3.14.3, and the core CI matrix covers Python 3.11-3.14 on Linux and
+Windows. From the repository root:
 
 ```bash
-conda env create -f environment.yml
-conda activate quantum-ed
-pip install -e .
-python -m pytest -q
-jupyter lab
+python -m pip install -r tools/uv-requirement.txt
+uv sync --locked --extra test --no-editable
+uv run --no-sync python -m pytest -q
+uv run --no-sync python demos/bell_cli.py
 ```
 
-### Option B - pip
+The demo prepares a Bell pair using H and CNOT. Its only nonzero amplitudes
+are those of `00` and `11`, each giving ideal measurement probability 1/2.
+The normal package installation also exercises packaging instead of depending
+on an editable source link. Core-only tests skip optional SDK examples.
+
+[Reproducible environments](docs/reference/reproducibility.md) explains the
+lockfile, profiles, installation checks, and environment reports. Convenience
+pip and [Conda](environment.yml) routes remain available, but do not enforce
+the locked versions by themselves.
+
+## Reproduce the comparisons
+
+For all five ecosystems and the full Bell-noise study:
 
 ```bash
-python -m venv .venv
-# Windows: .venv\Scripts\activate
-# Linux/macOS: source .venv/bin/activate
-python -m pip install --upgrade pip
-pip install -e ".[dev]"
-python -m pytest -q
-jupyter lab
+uv sync --locked --all-extras --no-editable
+uv run --no-sync python tools/validate_experiments.py --ecosystem numpy qiskit pennylane openqasm qsharp
+uv run --no-sync python -m studies.bell_noise.run_study --output-dir build/bell-noise-review
+uv run --no-sync python -m pytest -q
 ```
 
-The editable install matters because the repository uses a `src/` layout.
+The [experiment validation protocol](docs/reference/experiment-validation.md)
+states which outputs are compared, where full states are inspected, and how
+finite-shot results are accepted. The study's output directory contains CSV,
+JSON provenance, and two figures in PNG and SVG formats.
 
-Validate the experiment contracts and all local documentation links with:
+A lightweight study run is also available:
 
 ```bash
-python tools/verify_repository.py
+uv run --no-sync python -m studies.bell_noise.run_study --numpy-only --output-dir build/bell-noise-numpy
 ```
 
-Build the documentation site locally with:
+That mode validates NumPy against theory and explicitly records that no SDK
+comparison was performed.
+
+## Read or build the documentation
+
+Follow the [reviewer route](docs/reviewer-guide.md) for a short technical review,
+or start with [linear algebra](docs/01-linear-algebra/README.md) and proceed
+through states, measurement, entanglement, circuits, mixed states, and noise.
 
 ```bash
-pip install -e ".[docs]"
-python -m mkdocs serve
+uv sync --locked --extra docs --no-editable
+uv run --no-sync python tools/verify_repository.py
+uv run --no-sync python -m mkdocs build --strict
+uv run --no-sync python -m mkdocs serve
 ```
 
----
+[Scientific scope](docs/reference/scientific-scope.md) distinguishes identities,
+model assumptions, dated hardware estimates, and numerical evidence.
+[Input contracts](docs/reference/input-contracts.md) and
+[bit ordering](docs/reference/bit-ordering.md) define the code's conventions.
 
-## Review Checklist
+## Repository map
 
-For a fast technical review:
+| Location | Purpose |
+| --- | --- |
+| `src/quantum_ed/` | Installable NumPy-first toolkit |
+| `docs/` | Theory, study report, reviewer route, and references |
+| `notebooks/` | Ordered interactive lessons |
+| `experiments/` | Equivalent concepts across five ecosystems |
+| `studies/` | Capability comparisons and the complete Bell-noise study |
+| `exercises/` | Prompts and reference solutions |
+| `demos/` | Small runnable demonstrations |
+| `tests/` and `tools/` | Mathematical, behavioral, and repository checks |
 
-1. Install with `pip install -e ".[dev]"`.
-2. Run `python -m pytest -q`.
-3. Read the intro and one or two theory chapters in `docs/`.
-4. Inspect the NumPy-first implementations in `src/quantum_ed/`.
-5. Open one notebook or run a demo from `demos/`.
-6. Compare equivalent implementations through the experiment index in `experiments/`.
+## Scope and future directions
 
----
+This is an educational scientific-computing project using small simulated
+instances. The one-qubit VQE illustrates an optimization loop; its Q# and
+OpenQASM versions prepare the optimal ansatz without running an optimizer.
+The Bell study covers one initial state and identical independent local noise
+on two qubits. These examples demonstrate known effects and reproducible
+reasoning, without claiming quantum advantage or hardware performance.
 
-## Typical Use Cases
+Possible extensions include unequal or correlated noise, finite-shot
+entanglement certification, and hardware-calibrated timing models. They are
+future directions rather than completed features.
 
-- studying the mathematical foundations of quantum computing
-- using code to validate basic quantum operations
-- building a structured educational portfolio around physics-informed computing
-- creating a base for future extensions toward frameworks, noise models, and hardware-aware experiments
-
----
-
-## Contributing
-
-Improvements are welcome, especially:
-
-- clearer explanations
-- additional exercises
-- more tests
-- better notebook visualizations
-- careful extensions of the current theoretical scope
-
----
-
-## License
-
-MIT (see `LICENSE`).
+See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution and verification
+conventions. Licensed under [MIT](LICENSE).

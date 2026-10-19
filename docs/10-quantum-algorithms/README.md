@@ -20,7 +20,15 @@ $$
 \mathbf{P} \subseteq \mathbf{BPP} \subseteq \mathbf{BQP} \subseteq \mathbf{PSPACE}
 $$
 
-Problems such as **Integer Factorization** and **Discrete Logarithms** (solved exponentially fast by Shor's algorithm) and **Quantum Hamiltonian Simulation** belong to $\mathbf{BQP}$, but are widely believed to lie outside $\mathbf{BPP}$.
+Factoring and discrete logarithms have polynomial-time quantum algorithms;
+see [Shor](https://arxiv.org/abs/quant-ph/9508027). They are naturally function
+problems, so the decision-class notation above requires an appropriate
+formulation. No general polynomial-time classical algorithm for them is known,
+but an unconditional separation from classical polynomial time has not been
+proved. Quantum Hamiltonian simulation also requires specifying the Hamiltonian
+access model, evolution time, precision, and requested output; not every such
+simulation task is classically hard. The class containments do not establish
+strict inequalities between P, BPP, and BQP.
 
 ---
 

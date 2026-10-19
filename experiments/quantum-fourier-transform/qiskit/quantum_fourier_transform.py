@@ -4,10 +4,15 @@ from qiskit import QuantumCircuit
 from qiskit.primitives import StatevectorSampler
 
 
-def build_circuit() -> QuantumCircuit:
+def build_circuit(input_value: int = 1) -> QuantumCircuit:
     """Build a measured QFT of the input basis state 001."""
     circuit = QuantumCircuit(3)
-    circuit.x(0)
+    if not isinstance(input_value, int) or not 0 <= input_value < 8:
+        raise ValueError("input_value must be an integer in [0, 7]")
+    # Logical basis labels use q0 q1 q2, independent of Qiskit's display order.
+    for wire, bit in enumerate(f"{input_value:03b}"):
+        if bit == "1":
+            circuit.x(wire)
     circuit.h(0)
     circuit.cp(3.141592653589793 / 2.0, 1, 0)
     circuit.cp(3.141592653589793 / 4.0, 2, 0)

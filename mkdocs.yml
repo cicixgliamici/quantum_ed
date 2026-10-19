@@ -23,6 +23,7 @@ extra_javascript:
 
 nav:
   - Home: index.md
+  - Reviewer guide: reviewer-guide.md
   - Foundations:
       - Introduction: 00-intro/README.md
       - Linear algebra: 01-linear-algebra/README.md
@@ -37,6 +38,7 @@ nav:
       - Noise and channels: 07-noise-and-channels/README.md
       - Fidelity and trace distance: 07-noise-and-channels/FIDELITY.md
       - Ideal versus noisy: 07-noise-and-channels/ideal-vs-noisy.md
+      - Bell-pair noise study: 07-noise-and-channels/bell-noise-study.md
   - Computing:
       - Circuits and gates: 05-circuits-and-gates/README.md
       - Exercise solutions: 05-circuits-and-gates/solutions.md
@@ -55,3 +57,7 @@ nav:
       - Index: reference/README.md
       - Useful matrices: 09-useful-matrices/README.md
       - Bit ordering: reference/bit-ordering.md
+      - Input contracts: reference/input-contracts.md
+      - Experiment validation: reference/experiment-validation.md
+      - Scientific scope: reference/scientific-scope.md
+      - Reproducible environments: reference/reproducibility.md

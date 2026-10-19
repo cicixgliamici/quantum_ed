@@ -9,6 +9,12 @@ The **Quantum Fourier Transform (QFT)** is the quantum mechanical analogue of th
 
 While the classical Fast Fourier Transform (FFT) requires $O(n 2^n)$ arithmetic operations to process a vector of size $N = 2^n$, the QFT executes on an $n$-qubit quantum register in only **$O(n^2)$ quantum gates**, representing an exponential reduction in gate complexity.
 
+These procedures have different input/output access: QFT transforms amplitudes
+of an already prepared quantum state; it does not print all Fourier
+coefficients of arbitrary classical data. State preparation, readout, gate
+synthesis precision, and the surrounding task must be included before making
+an end-to-end speedup claim.
+
 ---
 
 ## 1. Mathematical Definition

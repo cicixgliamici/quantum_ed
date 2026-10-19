@@ -12,6 +12,10 @@ The final input measurement is not all zero, so the oracle is classified as
 `balanced`. The output qubit is intentionally not measured because it carries
 no classification result.
 
+Specifically, the result is `100` in wire order `x0 x1 x2`, or `001` in
+Qiskit's default classical display order. NumPy treats `x0` as the first,
+most significant tensor factor, matching the oracle control in the circuits.
+
 ## Implementations
 
 | Ecosystem | Source |

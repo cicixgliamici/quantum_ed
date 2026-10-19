@@ -1,5 +1,8 @@
 # Ideal versus noisy simulation
 
+This single-qubit example is the baseline. For a full experimental report with
+entanglement analysis, see the [Bell-pair noise study](../bell_noise/README.md).
+
 This study prepares $|0\rangle$ and applies bit-flip noise:
 
 $$

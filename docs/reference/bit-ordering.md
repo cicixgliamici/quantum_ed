@@ -41,9 +41,9 @@ $$
 |q_0 q_1 \dots q_{n-1}\rangle = |q_0\rangle \otimes |q_1\rangle \otimes \dots \otimes |q_{n-1}\rangle
 $$
 
-**Adopted by:** Standard physics textbooks (Nielsen & Chuang), **NumPy core in `quantum_ed`**, **PennyLane**, **Q#**, and **QuTiP**.
+**Used here by:** **NumPy core in `quantum_ed`** and **PennyLane** with explicitly ordered wires. A Q# result array preserves the order of its elements; it does not by itself specify a simulator's state-vector tensor order.
 
-### Little-Endian (Least Significant Bit on the Left / Qiskit Convention)
+### Little-Endian (Wire 0 Has the Least Significant Weight)
 
 In **little-endian** ordering (as adopted by **IBM Qiskit**):
 
@@ -72,7 +72,7 @@ Consider the state where **qubit 0 is in state $|1\rangle$** and **qubit 1 is in
 | Framework | State Representation | State Vector Index | Display String | Place Value Formula |
 | :--- | :--- | :--- | :--- | :--- |
 | **NumPy (`quantum_ed`)** | $|10\rangle = |1\rangle \otimes |0\rangle$ | `index 2` ($2 \cdot 1 + 0$) | `[0, 0, 1, 0]` | $2 \cdot q_0 + q_1$ |
-| **Q#** | `[One, Zero]` | `index 2` | `[1, 0]` | Lexicographic |
+| **Q# results** | `[One, Zero]` | Not specified by a result array | `[1, 0]` | Explicit element order |
 | **PennyLane** | `wires=[0, 1]` | `index 2` | `|10>` | Lexicographic |
 | **Qiskit** | $|q_1 q_0\rangle = |01\rangle$ | `index 1` ($1 \cdot 1 + 2 \cdot 0$) | `"01"` ($q_1=0, q_0=1$) | $q_0 + 2 \cdot q_1$ |
 
@@ -129,7 +129,10 @@ In Qiskit's internal operator representations, these matrices appear swapped bec
 
 ## 5. Converting Across Frameworks in Python
 
-Here is a Python utility to convert between Qiskit counts strings and NumPy state-vector indices:
+For measurements mapping `q[j]` to `c[j]`, the following utility converts
+Qiskit counts strings to NumPy state-vector indices. If a circuit changes the
+classical destinations, inspect that mapping first; reversing strings alone
+does not handle every circuit.
 
 ```python
 def qiskit_string_to_big_endian_index(bitstring: str) -> int:
@@ -171,6 +174,10 @@ When exploring this repository:
 
 1. **Analytical derivations and NumPy code** use **Big-Endian** ordering:
    Qubit 0 is always the leftmost qubit ($|q_0 q_1 \dots\rangle$).
-2. **Qiskit experiments** format printed outputs with qubit 0 on the **right**:
-   Every experiment README explicitly documents the expected bitstring in both formats.
-3. **Q# and OpenQASM 3** map `q[j]` to `c[j]` using matching indices, preserving wire order directly in result arrays.
+2. **Qiskit** prints classical bits highest-index first. With matching measurement destinations, qubit 0 appears on the right. Superdense coding reverses destinations deliberately so the printed string matches its logical message.
+3. **Q#** entrypoints return results in explicit array or tuple order. **OpenQASM 3** assigns measurements to declared classical destinations; its imported sampler display follows those destinations.
+4. **QPE** uses wire 0 as the least significant counting bit. Its wire-order result `100` therefore represents the numerical phase label `001`.
+
+The [scientific validation protocol](experiment-validation.md) describes the
+conversions used by automated comparisons, including tensor-axis reversal
+for Qiskit and actual classical destinations for sampled outputs.

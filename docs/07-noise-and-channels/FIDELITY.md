@@ -43,7 +43,14 @@ F(\rho, \sigma) = \left( \operatorname{Tr} \sqrt{\sqrt{\rho} \sigma \sqrt{\rho}}
 $$
 
 > [!NOTE]
-> **Convention Note:** In some theoretical quantum literature (such as Nielsen & Chuang), fidelity is defined without the square: $\sqrt{F} = \operatorname{Tr}\sqrt{\sqrt{\rho}\sigma\sqrt{\rho}}$. Major quantum software libraries (such as Qiskit and PennyLane) and modern information theory use the squared convention shown above so that $F(|\psi\rangle, |\phi\rangle) = |\langle\psi|\phi\rangle|^2$.
+> **Convention:** This repository uses squared fidelity F. Some sources use
+> root fidelity $f=\sqrt F$ instead. Translate formulas explicitly when changing
+> sources: for pure states, our F is $|\langle\psi|\phi\rangle|^2$.
+
+For definitions and the purification characterization, see Chapter 3 of
+[Watrous, The Theory of Quantum Information (2018)](https://cs.uwaterloo.ca/~watrous/TQI/TQI.pdf),
+which uses root fidelity. Squaring that convention gives the formulas here.
+The local toolkit implements `fidelity_pure`, not general mixed-state fidelity.
 
 ### Uhlmann's Theorem
 
@@ -117,58 +124,62 @@ $$
 
 Fidelity and trace distance are intimately connected. For any two density matrices $\rho$ and $\sigma$, they satisfy the **Fuchs-van de Graaf inequalities**:
 
+The primary source is [Fuchs and van de Graaf](https://arxiv.org/abs/quant-ph/9712042);
+the expression below is written in this repository's squared convention.
+
 $$
 1 - \sqrt{F(\rho, \sigma)} \le D(\rho, \sigma) \le \sqrt{1 - F(\rho, \sigma)}
 $$
 
 ### The Pure-State Identity
 
-When at least one of the states is pure ($|\psi\rangle$), the upper bound becomes an **exact equality**:
+When **both** states are pure, the upper bound is an exact equality:
 
 $$
-D(|\psi\rangle, \rho) = \sqrt{1 - F(|\psi\rangle, \rho)}
+D(|\psi\rangle, |\phi\rangle) = \sqrt{1 - |\langle\psi|\phi\rangle|^2}
 $$
 
-This relation allows instant conversion between pure-state fidelity and trace distance!
+Having only one pure state is insufficient. For $|0\rangle$ and $I/2$,
+F=1/2 and D=1/2, while $\sqrt{1-F}=1/\sqrt2$.
+For one pure reference the useful bounds are instead:
+
+$$
+1-F(|\psi\rangle,\rho)\le D(|\psi\rangle,\rho)
+\le\sqrt{1-F(|\psi\rangle,\rho)}.
+$$
+
+The stronger lower bound follows by measuring the projector onto
+$|\psi\rangle$: its outcome probabilities differ by $1-F$.
 
 ---
 
 ## 6. Python Implementation in `quantum_ed`
 
-The functions `fidelity_pure` and `trace_distance` are implemented in [`src/quantum_ed/density.py`](file:///c:/Progetti/quantum_ed/src/quantum_ed/density.py):
+The functions `fidelity_pure` and `trace_distance` are implemented in [`src/quantum_ed/density.py`](https://github.com/cicixgliamici/quantum_ed/blob/main/src/quantum_ed/density.py):
 
 ```python
 import numpy as np
-from quantum_ed.states import basis_0, basis_1
+from quantum_ed.states import ket0, ket1
 from quantum_ed.density import rho_from_ket, fidelity_pure, trace_distance
 
-# Target pure state |0>
-ket0 = basis_0()
-rho0 = rho_from_ket(ket0)
+zero_state = ket0()
+one_state = ket1()
+rho_zero = rho_from_ket(zero_state)
+rho_one = rho_from_ket(one_state)
+rho_mixed = np.eye(2, dtype=complex) / 2
 
-# Target pure state |1>
-ket1 = basis_1()
-rho1 = rho_from_ket(ket1)
+# Both states are pure, so the upper bound is attained.
+fidelity_orthogonal = fidelity_pure(zero_state, rho_one)
+distance_orthogonal = trace_distance(rho_zero, rho_one)
+assert np.isclose(distance_orthogonal, np.sqrt(1 - fidelity_orthogonal))
 
-# Maximally mixed state I/2
-rho_mix = 0.5 * np.eye(2, dtype=complex)
-
-# 1. Distinguishability between orthogonal states
-d_01 = trace_distance(rho0, rho1)
-f_01 = fidelity_pure(ket0, rho1)
-print(f"|0> vs |1>: Distance = {d_01:.4f}, Fidelity = {f_01:.4f}")
-# Expected: Distance = 1.0000, Fidelity = 0.0000
-
-# 2. Distinguishability between |0> and I/2
-d_0mix = trace_distance(rho0, rho_mix)
-f_0mix = fidelity_pure(ket0, rho_mix)
-print(f"|0> vs I/2: Distance = {d_0mix:.4f}, Fidelity = {f_0mix:.4f}")
-# Expected: Distance = 0.5000, Fidelity = 0.5000
-
-# 3. Verify Fuchs-van de Graaf equality for pure state |0>:
-# D = sqrt(1 - F) = sqrt(1 - 0.5) = sqrt(0.5) ~ 0.7071?
-# Note: For mixed rho_mix, check:
-assert np.isclose(d_0mix, 0.5)
+# One pure and one mixed state: the upper bound need not be attained.
+fidelity_mixed = fidelity_pure(zero_state, rho_mixed)
+distance_mixed = trace_distance(rho_zero, rho_mixed)
+assert np.isclose(fidelity_mixed, 0.5)
+assert np.isclose(distance_mixed, 0.5)
+assert 1 - fidelity_mixed <= distance_mixed <= np.sqrt(1 - fidelity_mixed)
+assert not np.isclose(distance_mixed, np.sqrt(1 - fidelity_mixed))
 ```
 
 ---

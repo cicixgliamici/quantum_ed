@@ -1,5 +1,10 @@
 # Ideal vs Noisy Execution: A Capability Study
 
+For a complete, executable investigation with analytical predictions and
+entanglement measurements, start with the
+[Bell-pair noise study](bell-noise-study.md). The single-qubit example below
+provides a minimal baseline and the later depth model is a separate assumption.
+
 In quantum computing education and software development, developers frequently transition between **ideal unitary simulators** and **noisy open-system models**. Understanding the fundamental mathematical and computational differences between these two simulation paradigms is essential for realistic hardware emulation.
 
 This document examines:
@@ -17,13 +22,20 @@ Simulating quantum circuits on classical hardware is governed by distinct comput
 
 | Simulation Paradigm | Mathematical Object | Memory Scaling ($n$ Qubits) | Simulates Noise? | Key Use Case |
 | :--- | :--- | :--- | :--- | :--- |
-| **State-Vector Simulator** | Complex vector $|\psi\rangle \in \mathbb{C}^{2^n}$ | $2^n$ amplitudes ($16 \times 2^n$ bytes) | No (ideal unitaries only) | Fast algorithmic validation ($n \le 30$) |
-| **Density-Matrix Simulator** | Hermitian matrix $\rho \in \mathbb{C}^{2^n \times 2^n}$ | $4^n$ entries ($16 \times 4^n$ bytes) | Yes (exact CPTP channels) | Small open systems ($n \le 15$) |
-| **Stochastic Trajectory (Monte Carlo)** | Ensemble of state vectors $\{|\psi^{(s)}\rangle\}$ | $2^n$ amplitudes | Yes (stochastic quantum jumps) | Moderate-sized noisy circuits ($n \le 26$) |
+| **State-Vector Simulator** | Complex vector $|\psi\rangle \in \mathbb{C}^{2^n}$ | $2^n$ amplitudes ($16 \times 2^n$ bytes) | A single vector does not encode a general mixture | Ideal evolution or individual pure-state branches |
+| **Density-Matrix Simulator** | Hermitian matrix $\rho \in \mathbb{C}^{2^n \times 2^n}$ | $4^n$ entries ($16 \times 4^n$ bytes) | Direct deterministic CPTP evolution, up to numerical error | Explicit mixed states |
+| **Stochastic Trajectory (Monte Carlo)** | Sampled pure-state branches | $2^n$ amplitudes per live trajectory | Ensemble observables estimate noisy evolution | Memory versus sampling-accuracy tradeoff |
+
+Storage figures assume complex128 entries and exclude working buffers. There
+is no universal qubit ceiling: hardware, representation, gate structure,
+simulation time, and requested accuracy all matter. Keeping many trajectories
+simultaneously also increases memory use.
 
 ### 1. State-Vector Simulation
 State-vector simulators (such as Qiskit's `Statevector` or PennyLane's `default.qubit`) represent the quantum state as a column vector of length $2^n$. Applying a gate $U$ corresponds to matrix-vector multiplication $|\psi'\rangle = U|\psi\rangle$.
-- **Limitation:** Cannot represent classical mixtures, subsystem decoherence, or non-unitary channels without artificially enlarging the Hilbert space.
+- **Limitation:** One state vector alone cannot represent a general mixed
+  density matrix. Purification can use additional wires, and stochastic
+  ensembles can estimate mixed-state observables from pure-state branches.
 
 ### 2. Density-Matrix Simulation
 Density-matrix simulators (such as PennyLane's `default.mixed` or Qiskit Aer's `density_matrix` method) track the full $2^n \times 2^n$ matrix $\rho$. A quantum channel $\mathcal{E}$ is simulated using the Kraus operator-sum representation:
@@ -32,7 +44,10 @@ $$
 \rho' = \sum_k K_k \rho K_k^\dagger
 $$
 
-- **Limitation:** The memory requirement scales as $O(4^n) = O(2^{2n})$. Simulating 16 qubits requires $4^{16} \times 16\ \text{bytes} \approx 68.7\ \text{GB}$ of RAM, compared to only $1\ \text{MB}$ for state-vector simulation.
+- **Limitation:** Dense storage scales as $O(4^n)$. At 16 qubits, the matrix
+  alone occupies 68,719,476,736 bytes: 64 GiB, or about 68.7 decimal GB.
+  The corresponding vector occupies 1,048,576 bytes: 1 MiB. Actual peak
+  memory exceeds storage for the state itself.
 
 ---
 
@@ -46,7 +61,14 @@ A critical observation documented in this repository's studies is the **portabil
 - **Noisy Circuit Execution:** How noise is attached to that gate differs fundamentally:
   - In **Qiskit Aer**, noise is declared via a `NoiseModel` object associating a discrete CPTP channel with specific gate names and qubit pairings.
   - In **PennyLane**, noise is expressed directly inside the circuit as quantum operations (e.g. `qml.DepolarizingChannel(p, wires=0)`).
-  - In **physical hardware**, noise is not a discrete map at all, but a time-continuous open-system Lindbladian generator $\dot{\rho} = -i[H(t), \rho] + \sum_k \mathcal{D}[L_k]\rho$ reflecting physical control pulses, crosstalk, and thermal bath coupling.
+  - In **physical hardware**, a finite-time process can be modeled by a channel
+    under suitable system-environment assumptions. A continuous Lindblad master
+    equation is one Markovian approximation, not a universal exact account of
+    all hardware noise. Memory effects can require other descriptions.
+
+The [channel chapter](README.md) states the initial-environment assumptions;
+the [Bell study](bell-noise-study.md) demonstrates why matching channel
+parameters is necessary even when frameworks use the same channel name.
 
 ---
 
@@ -93,14 +115,14 @@ Both the NumPy core and PennyLane's mixed-state simulator produce identical pred
 ```python
 import numpy as np
 import pennylane as qml
-from quantum_ed.states import basis_0
+from quantum_ed.states import ket0
 from quantum_ed.density import rho_from_ket
 from quantum_ed.channels import bit_flip_rho
 
 p_val = 0.25
 
 # 1. NumPy core implementation
-rho_init = rho_from_ket(basis_0())
+rho_init = rho_from_ket(ket0())
 rho_noisy = bit_flip_rho(rho_init, p=p_val)
 prob_numpy = float(np.real(rho_noisy[1, 1]))
 
@@ -128,7 +150,11 @@ In realistic quantum algorithms, each gate layer introduces an incremental proba
 
 ### Fidelity Decay Under Depolarizing Noise
 
-Suppose an $n$-qubit circuit consists of $L$ sequential layers, where each layer introduces an average depolarizing error $p_{\mathrm{layer}}$. The fidelity with respect to the ideal target pure state decays exponentially:
+Assume an $n$-qubit circuit starts in a pure state and each of its $L$ layers
+applies the same global channel
+$\mathcal E(\rho)=(1-p_{\mathrm{layer}})\rho+p_{\mathrm{layer}}I/2^n$
+in addition to ideal unitary gates. Under this particular global mixing model,
+fidelity with the ideal final state is:
 
 $$
 F(L) = \frac{1}{2^n} + \left( 1 - \frac{1}{2^n} \right) (1 - p_{\mathrm{layer}})^L
@@ -137,15 +163,19 @@ $$
 - When $L = 0$: $F(0) = \frac{1}{2^n} + 1 - \frac{1}{2^n} = 1.0$ (perfect fidelity).
 - As $L \to \infty$: $F(L) \to \frac{1}{2^n}$ (the state converges to the maximally mixed state $I/2^n$, pure white noise containing zero computational signal).
 
-### The Quantum Volume & Coherent Depth Threshold
+### A Characteristic Decay Scale
 
-This exponential decay establishes a hard upper limit on the **coherent circuit depth**:
+The approximate scale over which the signal above the fully mixed baseline
+falls by a factor of e, for small $p_{\mathrm{layer}}$, is:
 
 $$
 L_{\mathrm{threshold}} \approx \frac{1}{p_{\mathrm{layer}}}
 $$
 
-For a current NISQ processor with average two-qubit gate error $p = 1\% = 0.01$, circuits deeper than $\sim 100$ entangling layers produce outputs indistinguishable from uniform random noise unless error mitigation or quantum error correction is applied.
+At this scale the initial contrast is about $e^{-1}$ of its original value;
+it is not a universal hard depth bound or a statement that outputs are uniform.
+This global channel differs from the independent local channels in the Bell
+study. A hardware gate-error figure alone does not determine either model.
 
 ---
 
@@ -161,11 +191,12 @@ Assume double-precision complex numbers (16 bytes per entry: 8 bytes real, 8 byt
 **Solution:**
 1. State-vector simulator ($2^n$ entries):
    - $N = 2^{20} = 1,048,576$ entries.
-   - Memory = $1,048,576 \times 16\ \text{bytes} = 16,777,216\ \text{bytes} = 16\ \text{MB}$.
+   - Memory = 16,777,216 bytes = 16 MiB, or about 16.8 decimal MB.
 2. Density-matrix simulator ($4^n$ entries):
    - $N = 4^{20} = (2^{20})^2 = 1,099,511,627,776$ entries.
-   - Memory = $4^{20} \times 16\ \text{bytes} \approx 1.76 \times 10^{13}\ \text{bytes} \approx 17.6\ \text{Terabytes}$ (TB) of RAM!
-This dramatic difference demonstrates why density-matrix simulation is computationally restricted to small quantum registers ($n \le 14\text{--}15$).
+   - Memory = 17,592,186,044,416 bytes = 16 TiB, or about 17.6 decimal TB.
+This is dense state storage only, before temporary arrays and simulation work.
+It illustrates the scaling difference without asserting a fixed qubit limit.
 
 ---
 

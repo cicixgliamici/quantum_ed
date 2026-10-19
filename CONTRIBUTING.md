@@ -38,15 +38,30 @@ Add ecosystems only when they implement the same logical experiment.
 
 ## Verification
 
+For scientific notes, follow the [scope and evidence conventions](docs/reference/scientific-scope.md).
+State approximation assumptions and distinguish state/gate fidelity from fault
+probability. Cite dated primary sources for experimental or resource claims.
+Add runnable examples to the reviewed-example checks when they support a
+numerical result; comparisons must state tensor order and numerical tolerances.
+
 ```bash
-python -m pip install -e ".[dev]"
-python tools/verify_repository.py
-python -m pytest -q
+python -m pip install -r tools/uv-requirement.txt
+uv sync --locked --extra test --no-editable
+uv run --no-sync python tools/verify_repository.py
+uv run --no-sync python -m pytest -q
 ```
 
 For Qiskit experiments, install `.[showcase]` and run the command documented in
 the relevant experiment README.
 
-The GitHub Actions workflow additionally parses every OpenQASM source and
-compiles every Q# source in isolated jobs. It also executes clean copies of all
-notebooks and builds the MkDocs site in strict mode.
+The GitHub Actions workflow executes declared experiments against analytical
+references in separate SDK jobs, including Q# and imported OpenQASM. It also
+reproduces the Bell-noise study, executes clean notebook copies, and builds
+the MkDocs site in strict mode. Core-only installation skips optional SDK tests;
+the corresponding jobs install and test those dependencies explicitly.
+
+For active source editing, use `uv sync --locked --extra dev` for an editable
+installation. For a noneditable recheck after changing source, add
+`--reinstall-package quantum-ed` to synchronization. Dependency updates must
+include the lockfile and should follow the
+[environment reproduction guide](docs/reference/reproducibility.md).

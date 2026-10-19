@@ -13,20 +13,31 @@ from __future__ import annotations
 
 import numpy as np
 
-from .linalg import dagger, projector, trace
+from .linalg import dagger, projector
+from ._validation import density_matrix, finite_array, state_vector
 
 
 def rho_from_ket(ket: np.ndarray) -> np.ndarray:
-    """Return density matrix rho = |psi><psi|."""
+    """Return rho = |psi><psi| from a normalized qubit column vector.
+
+    Reject unnormalized inputs rather than silently changing their scale.
+    """
+    ket = state_vector(ket, normalized=True)
     return projector(ket)
 
 
 def fidelity_pure(ket: np.ndarray, rho: np.ndarray) -> float:
     """Fidelity between pure state |psi> and density matrix rho.
 
-    F = <psi| rho |psi>
+    F = <psi| rho |psi>. The ket must be normalized; a flat vector is
+    accepted here for compatibility, as well as the usual column vector.
     """
-    ket = ket.reshape((-1, 1))
+    ket = finite_array(ket, "ket")
+    # Preserve the existing flat-vector convenience without flattening matrices.
+    if ket.ndim == 1:
+        ket = ket.reshape((-1, 1))
+    ket = state_vector(ket, normalized=True)
+    rho = density_matrix(rho, dimension=ket.shape[0])
     val = (dagger(ket) @ rho @ ket).item()
     return float(np.real(val))
 
@@ -39,6 +50,8 @@ def trace_distance(rho: np.ndarray, sigma: np.ndarray) -> float:
     For Hermitian rho - sigma, this equals half the sum of the absolute
     eigenvalues of rho - sigma.
     """
+    rho = density_matrix(rho)
+    sigma = density_matrix(sigma, dimension=rho.shape[0])
     delta = rho - sigma
     eigvals = np.linalg.eigvalsh(delta)
     return 0.5 * float(np.sum(np.abs(eigvals)))
@@ -50,10 +63,10 @@ def partial_trace_two_qubits(rho: np.ndarray, keep: int) -> np.ndarray:
     keep = 0 keeps the first qubit (trace out second).
     keep = 1 keeps the second qubit (trace out first).
 
-    Returns a 2x2 density matrix.
+    Returns a 2x2 density matrix. Input must be physical and trace one;
+    neither input nor output is automatically renormalized.
     """
-    if rho.shape != (4, 4):
-        raise ValueError("rho must be 4x4 for two qubits")
+    rho = density_matrix(rho, dimension=4)
     if keep not in (0, 1):
         raise ValueError("keep must be 0 or 1")
 
@@ -78,7 +91,5 @@ def partial_trace_two_qubits(rho: np.ndarray, keep: int) -> np.ndarray:
                     s += rho[i, j]
                 out[b, bp] = s
 
-    tr = trace(out)
-    if abs(tr) > 0:
-        out = out / tr
+    # Partial trace preserves trace; rescaling here would hide invalid inputs.
     return out

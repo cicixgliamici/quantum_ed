@@ -781,9 +781,9 @@ state = apply(CNOT, state)
 
 The main code for this chapter is located in:
 
-- [`src/quantum_ed/gates.py`](file:///c:/Progetti/quantum_ed/src/quantum_ed/gates.py)
-- [`src/quantum_ed/linalg.py`](file:///c:/Progetti/quantum_ed/src/quantum_ed/linalg.py)
-- [`src/quantum_ed/states.py`](file:///c:/Progetti/quantum_ed/src/quantum_ed/states.py)
+- [`src/quantum_ed/gates.py`](https://github.com/cicixgliamici/quantum_ed/blob/main/src/quantum_ed/gates.py)
+- [`src/quantum_ed/linalg.py`](https://github.com/cicixgliamici/quantum_ed/blob/main/src/quantum_ed/linalg.py)
+- [`src/quantum_ed/states.py`](https://github.com/cicixgliamici/quantum_ed/blob/main/src/quantum_ed/states.py)
 
 Key gate definitions and functions:
 

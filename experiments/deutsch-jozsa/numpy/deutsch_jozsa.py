@@ -19,7 +19,8 @@ def hadamard_register(qubit_count: int) -> np.ndarray:
 def balanced_oracle_phases(qubit_count: int) -> np.ndarray:
     """Return phases for the balanced function f(x)=x_0."""
     values = np.arange(2**qubit_count)
-    return (-1.0) ** (values & 1)
+    # NumPy's first tensor factor is x_0, the most significant input bit.
+    return (-1.0) ** ((values >> (qubit_count - 1)) & 1)
 
 
 def final_probabilities() -> np.ndarray:

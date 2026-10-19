@@ -7,10 +7,15 @@ Later we can generalize to n qubits and arbitrary bases.
 from __future__ import annotations
 import numpy as np
 from .states import normalize, ket0, ket1
+from ._validation import state_vector
 
 def probs_comp_basis(ket: np.ndarray) -> tuple[float, float]:
-    """Return probabilities (p0, p1) for measuring a qubit in {|0>,|1>} basis."""
-    ket = normalize(ket)
+    """Return (p0, p1) for a single qubit, normalizing its input explicitly.
+
+    Input must be a finite, nonzero column vector with shape (2, 1).
+    """
+    # Reject registers before normalization instead of discarding amplitudes.
+    ket = normalize(state_vector(ket, dimension=2))
     a = ket[0,0]
     b = ket[1,0]
     p0 = float((abs(a)**2).real)
@@ -24,7 +29,8 @@ def probs_comp_basis(ket: np.ndarray) -> tuple[float, float]:
 def measure_comp_basis(ket: np.ndarray, rng: np.random.Generator | None = None) -> tuple[int, np.ndarray]:
     """Measure a qubit in computational basis.
 
-    Returns (outcome, post_state).
+    Returns (outcome, post_state). The finite (2, 1) input is normalized
+    using the same policy as probs_comp_basis; the input is not modified.
     """
     if rng is None:
         rng = np.random.default_rng()

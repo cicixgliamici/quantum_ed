@@ -155,8 +155,8 @@ The reduced density matrix of Bob's qubit $\rho_B = \operatorname{Tr}_{CA}(\rho_
 
 ```python
 import numpy as np
-from quantum_ed.gates import H, CNOT, CZ, I, apply, kron_n
-from quantum_ed.states import basis_0, basis_1, bell_phi_plus
+from quantum_ed.gates import H, CNOT, I, kron_n
+from quantum_ed.states import bell_phi_plus
 from quantum_ed.density import rho_from_ket, fidelity_pure
 
 # 1. Prepare an arbitrary normalized state |psi> = alpha|0> + beta|1>
@@ -164,7 +164,7 @@ theta = 0.73
 phi_angle = 1.25
 alpha = np.cos(theta)
 beta = np.sin(theta) * np.exp(1j * phi_angle)
-psi_target = np.array([alpha, beta], dtype=complex)
+psi_target = np.array([[alpha], [beta]], dtype=complex)
 
 # 2. Prepare 3-qubit state: |psi> (wire 0) (x) |Phi+> (wires 1, 2)
 bell = bell_phi_plus()

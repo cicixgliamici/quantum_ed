@@ -2,8 +2,8 @@
 
 import numpy as np
 
-from quantum_ed.gates import CNOT, H, I, X, apply, kron_n
-from quantum_ed.states import ket0
+from quantum_ed.gates import CNOT, H, I, apply, kron_n
+from quantum_ed.states import ket0, ket1, normalize
 
 
 def nonadjacent_cz() -> np.ndarray:
@@ -16,12 +16,14 @@ def nonadjacent_cz() -> np.ndarray:
     return np.diag(diagonal)
 
 
-def teleported_state() -> np.ndarray:
-    """Return the three-qubit state after coherent teleportation corrections."""
-    state = kron_n(ket0(), ket0(), ket0())
+def teleported_state(input_state: np.ndarray | None = None) -> np.ndarray:
+    """Teleport a single-qubit column vector, explicitly normalizing it first."""
+    message = normalize(ket1() if input_state is None else input_state)
+    if message.shape != (2, 1):
+        raise ValueError("input_state must have shape (2, 1)")
+    state = kron_n(message, ket0(), ket0())
 
-    # Qubit 0 holds |1>; qubits 1 and 2 become the shared Bell pair.
-    state = apply(kron_n(X, I, I), state)
+    # Qubit 0 holds the message; qubits 1 and 2 become the shared Bell pair.
     state = apply(kron_n(I, H, I), state)
     state = apply(kron_n(I, CNOT), state)
 

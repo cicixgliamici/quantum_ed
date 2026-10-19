@@ -15,27 +15,29 @@ from __future__ import annotations
 import numpy as np
 
 from .gates import X, Z
+from ._validation import density_matrix, real_scalar
 
 
 def _validate_probability(p: float) -> None:
+    p = real_scalar(p, "p")
     if not (0.0 <= p <= 1.0):
         raise ValueError("p must be in [0,1]")
 
 
 def is_density_matrix(rho: np.ndarray, atol: float = 1e-10) -> bool:
-    if rho.shape != (2, 2):
+    """Return whether rho is a physical one-qubit state within atol."""
+    # A predicate reports invalid states as False rather than exposing eigensolver errors.
+    try:
+        density_matrix(rho, dimension=2, atol=atol)
+    except (ValueError, TypeError):
         return False
-    if not np.allclose(rho, np.conjugate(rho).T, atol=atol):
-        return False
-    if not np.allclose(np.trace(rho), 1.0, atol=atol):
-        return False
-    ev = np.linalg.eigvalsh(rho)
-    return np.all(ev >= -atol)
+    return True
 
 
 def depolarize_rho(rho: np.ndarray, p: float) -> np.ndarray:
     """Depolarizing channel: rho -> (1-p) rho + p I/2."""
     _validate_probability(p)
+    rho = density_matrix(rho, dimension=2)
     i2 = np.eye(2, dtype=complex)
     return (1.0 - p) * rho + p * (i2 / 2.0)
 
@@ -48,6 +50,7 @@ def dephase_rho(rho: np.ndarray, p: float) -> np.ndarray:
               [(1-p)rho10, rho11]]
     """
     _validate_probability(p)
+    rho = density_matrix(rho, dimension=2)
     out = rho.copy().astype(complex)
     out[0, 1] *= (1.0 - p)
     out[1, 0] *= (1.0 - p)
@@ -57,12 +60,14 @@ def dephase_rho(rho: np.ndarray, p: float) -> np.ndarray:
 def bit_flip_rho(rho: np.ndarray, p: float) -> np.ndarray:
     """Bit-flip channel: rho -> (1-p) rho + p X rho X."""
     _validate_probability(p)
+    rho = density_matrix(rho, dimension=2)
     return (1.0 - p) * rho + p * (X @ rho @ X)
 
 
 def phase_flip_rho(rho: np.ndarray, p: float) -> np.ndarray:
     """Phase-flip channel: rho -> (1-p) rho + p Z rho Z."""
     _validate_probability(p)
+    rho = density_matrix(rho, dimension=2)
     return (1.0 - p) * rho + p * (Z @ rho @ Z)
 
 
@@ -72,6 +77,7 @@ def amplitude_damp_rho(rho: np.ndarray, p: float) -> np.ndarray:
     This models energy relaxation from |1> to |0>.
     """
     _validate_probability(p)
+    rho = density_matrix(rho, dimension=2)
     k0 = np.array([[1.0, 0.0], [0.0, np.sqrt(1.0 - p)]], dtype=complex)
     k1 = np.array([[0.0, np.sqrt(p)], [0.0, 0.0]], dtype=complex)
     return k0 @ rho @ np.conjugate(k0).T + k1 @ rho @ np.conjugate(k1).T

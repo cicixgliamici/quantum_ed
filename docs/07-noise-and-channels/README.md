@@ -12,10 +12,10 @@ The distinction between ideal and real quantum evolution is summarized below:
 
 | Feature | Closed Quantum System | Open Quantum System |
 | :--- | :--- | :--- |
-| **Mathematical State** | State vector $|\psi\rangle \in \mathcal{H}$ | Density matrix $\rho \in \mathcal{L}(\mathcal{H})$ |
+| **Mathematical State** | Density matrix; a state vector suffices for a pure state | Density matrix, including mixed states |
 | **Dynamical Map** | Unitary transformation $\rho \mapsto U \rho U^\dagger$ | Quantum channel $\rho \mapsto \mathcal{E}(\rho)$ |
-| **Energy Exchange** | Strictly conserved | Dissipation & relaxation into environment |
-| **Coherence & Entropy** | Entropy is invariant ($S(\rho) = \text{const}$) | Purity decreases; entropy increases |
+| **Energy Exchange** | Energy expectation is conserved for a time-independent Hamiltonian; external drives can do work | Energy can flow between system and environment |
+| **Coherence & Entropy** | Unitary evolution preserves entropy and purity | Entropy and purity can increase or decrease |
 | **Reversibility** | Strictly reversible ($U^{-1} = U^\dagger$) | Irreversible in general |
 
 ### Stinespring Dilation: How Noise Arises
@@ -28,7 +28,12 @@ $$
 \mathcal{E}(\rho) = \operatorname{Tr}_E \left( U_{SE} (\rho \otimes |e_0\rangle\langle e_0|_E) U_{SE}^\dagger \right)
 $$
 
-This result, known as the **Stinespring Dilation Theorem**, proves that every physically realizable noise process is mathematically equivalent to unitary interaction with an environment followed by partial trace.
+For a deterministic finite-dimensional CPTP map, a unitary dilation with a
+fixed initially uncorrelated environment exists. This does not assert that
+every system with pre-existing system-environment correlations has a CPTP
+reduced map for arbitrary initial system states. Selected measurement branches
+can be trace-decreasing. See the channel representations in Chapter 2 of
+[Watrous (2018)](https://cs.uwaterloo.ca/~watrous/TQI/TQI.pdf).
 
 ---
 
@@ -122,11 +127,15 @@ $$
 
 Notice that the diagonal populations remain strictly unchanged, while the off-diagonal coherences are attenuated by a factor of $(1-2p)$. When $p=1/2$, the coherences vanish completely.
 
+For p greater than 1/2 this factor is negative; at p=1 the channel is the
+deterministic unitary Z. Thus increasing phase-flip probability over the full
+interval does not mean monotonically increasing decoherence.
+
 ### 3. The Pure Dephasing Channel
 
 In physical implementations (e.g. superconducting transmons), environmental fluctuations cause low-frequency shifts in qubit transition frequencies, causing the relative phase $\phi$ to diffuse continuously.
 
-A general dephasing channel with dephasing parameter $\lambda \in [0, 1]$ acts as:
+A dephasing model with real attenuation parameter $\lambda \in [0, 1]$ acts as:
 
 $$
 \mathcal{E}_{\mathrm{dephase}}(\rho) = \begin{bmatrix}
@@ -141,7 +150,9 @@ $$
 
 ### 4. The Depolarizing Channel
 
-The depolarizing channel represents isotropic, worst-case decoherence. With probability $(1-p)$, the qubit survives intact; with probability $p$, it is degraded into the maximally mixed state $I/2$:
+The depolarizing channel is an isotropic mixing model, not a universal worst
+case for every task or input. For the convention used here, with strength
+$p\in[0,1]$ it acts on trace-one states as:
 
 $$
 \mathcal{E}_{\mathrm{dep}}(\rho) = (1-p)\rho + p \frac{I}{2}
@@ -166,6 +177,11 @@ $$
 $$
 
   Every point inside or on the surface of the sphere shrinks isotropically.
+
+This p is a mixing strength, not average gate infidelity or total Pauli-error
+probability. For comparison, PennyLane's
+[DepolarizingChannel](https://docs.pennylane.ai/en/stable/code/api/pennylane.DepolarizingChannel.html)
+uses total Pauli-error probability `3*p/4` for this same map.
 
 ### 5. The Amplitude Damping Channel (Energy Relaxation)
 
@@ -209,6 +225,12 @@ $$
 
 In physical hardware characterization, noise channels are parameterized by characteristic relaxation timescales:
 
+The following exponential relations assume stationary, Markovian relaxation
+toward the ground state and independent exponential pure dephasing, with ideal
+phase rotation removed. Nonexponential decay and differently fitted Ramsey or
+echo times require separate treatment. See the physical models reviewed by
+[Krantz et al. (2019)](https://arxiv.org/abs/1904.06560).
+
 ### $T_1$ — Longitudinal Relaxation Time
 
 $T_1$ measures how long an excited qubit stays in $|1\rangle$ before decaying into $|0\rangle$ through energy dissipation:
@@ -243,23 +265,30 @@ $$
 \frac{1}{T_2} = \frac{1}{2T_1} + \frac{1}{T_\phi}
 $$
 
-Since the pure dephasing rate is always non-negative ($1/T_\phi \ge 0$), this establishes the **fundamental physical bound on quantum coherence**:
+Nonnegative pure dephasing rate gives the following bound **within this model**:
 
 $$
 T_2 \le 2 T_1
 $$
 
-In an ideal device with zero pure dephasing ($T_\phi \to \infty$), the coherence time reaches its theoretical upper limit: $T_2 = 2T_1$. In current NISQ hardware, typical transmon processors exhibit $T_1 \approx 50\text{--}150\ \mu\text{s}$ and $T_2 \approx 40\text{--}120\ \mu\text{s}$.
+With zero pure dephasing, this model gives $T_2=2T_1$. There is no universal
+numerical coherence time for a hardware modality. At finite thermal population,
+the relaxation law instead approaches the nonzero equilibrium excited-state
+population, rather than necessarily reaching the ground state.
+
+Amplitude damping is non-unital and can lower entropy, as a fully relaxed
+qubit becomes pure. The [Bell-noise study](bell-noise-study.md) shows this
+directly; open-system evolution does not imply monotonically decreasing purity.
 
 ---
 
 ## 5. Noise and Channel Implementation in `quantum_ed`
 
-The repository implements standard single-qubit noise channels in [`src/quantum_ed/channels.py`](file:///c:/Progetti/quantum_ed/src/quantum_ed/channels.py) and metrics in [`src/quantum_ed/density.py`](file:///c:/Progetti/quantum_ed/src/quantum_ed/density.py):
+The repository implements standard single-qubit noise channels in [`src/quantum_ed/channels.py`](https://github.com/cicixgliamici/quantum_ed/blob/main/src/quantum_ed/channels.py) and metrics in [`src/quantum_ed/density.py`](https://github.com/cicixgliamici/quantum_ed/blob/main/src/quantum_ed/density.py):
 
 ```python
 import numpy as np
-from quantum_ed.states import basis_0, basis_1
+from quantum_ed.states import ket0, ket1
 from quantum_ed.density import rho_from_ket, fidelity_pure
 from quantum_ed.channels import (
     depolarize_rho,
@@ -270,7 +299,7 @@ from quantum_ed.channels import (
 )
 
 # Prepare pure superposition |+>
-ket_plus = (basis_0() + basis_1()) / np.sqrt(2)
+ket_plus = (ket0() + ket1()) / np.sqrt(2)
 rho_plus = rho_from_ket(ket_plus)
 
 # 1. Apply Dephasing with strength p = 0.3
@@ -283,13 +312,13 @@ f_dephased = fidelity_pure(ket_plus, rho_dephased)
 print(f"Fidelity after dephasing: {f_dephased:.4f}")  # 0.8500
 
 # 3. Apply Amplitude Damping to |1> with decay probability p = 0.5
-rho_1 = rho_from_ket(basis_1())
+rho_1 = rho_from_ket(ket1())
 rho_relaxed = amplitude_damp_rho(rho_1, p=0.5)
 print("Amplitude damped |1><1|:\n", rho_relaxed)
 # Diagonal is [[0.5, 0], [0, 0.5]]
 
 # Check ground state population
-f_ground = fidelity_pure(basis_0(), rho_relaxed)
+f_ground = fidelity_pure(ket0(), rho_relaxed)
 print(f"Ground state population: {f_ground:.4f}")  # 0.5000
 ```
 

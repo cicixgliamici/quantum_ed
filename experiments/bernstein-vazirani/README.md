@@ -10,6 +10,10 @@ Boolean inner product between the input and the secret into a target qubit.
 The input register is measured as `101`. The implementations document whether
 that value is expressed in qubit-index order or display order.
 
+Secret characters follow increasing input-wire index. The default `101` is
+unchanged when reversed, so Qiskit tests also use asymmetric secrets such as
+`001` and `100`; its recovery function reverses raw displayed counts.
+
 ## Implementations
 
 | Ecosystem | Source |

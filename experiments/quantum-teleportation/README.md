@@ -14,6 +14,12 @@ measurement principle: the corrections remain coherently controlled until the
 end. Both circuits produce the same state on Bob's qubit, while the coherent
 form is portable across static circuit representations.
 
+The default entrypoints still transfer `|1>`. Validation also checks seven
+inputs, including superpositions with complex relative phase, by comparing
+Bob's reduced density matrix with the input state. The Python entrypoints
+accept a single-qubit column vector and normalize it explicitly; Q# and
+OpenQASM expose reusable preparations for the same checks.
+
 ## Implementations
 
 | Ecosystem | Source | Expected result |

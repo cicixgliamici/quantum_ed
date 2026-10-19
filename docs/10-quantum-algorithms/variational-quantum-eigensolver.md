@@ -1,12 +1,23 @@
 # Variational Quantum Eigensolver (VQE)
 
-The **Variational Quantum Eigensolver (VQE)** is the flagship hybrid quantum-classical algorithm designed for the Noisy Intermediate-Scale Quantum (NISQ) era. Introduced by Alberto Peruzzo and collaborators in 2014, VQE calculates the ground-state energy of a quantum Hamiltonian (such as a molecular system in quantum chemistry or a spin lattice in condensed matter physics) using shallow, error-resilient quantum circuits.
+The **Variational Quantum Eigensolver (VQE)** estimates a Hamiltonian's ground
+energy by optimizing a parameterized trial state. A quantum device estimates
+expectation values and a classical optimizer changes the parameters.
+[Peruzzo et al.](https://arxiv.org/abs/1304.3061) proposed and demonstrated this
+hybrid approach. Circuit depth, accuracy, noise sensitivity, and optimization
+cost depend on the problem and ansatz; VQE has no general guarantee of noise
+resilience or quantum advantage.
 
 ---
 
 ## 1. The NISQ Dilemma & Hybrid Algorithms
 
-Fault-tolerant quantum algorithms such as Quantum Phase Estimation (QPE) achieve exponential speedups for quantum simulation, but they require deep circuits with thousands of coherent entangling gates and full quantum error correction.
+Phase estimation uses controlled unitary powers to estimate eigenphases.
+Large, accurate instances can require substantial coherent evolution and error
+correction, while small examples can run without it. Neither QPE nor VQE
+automatically implies an exponential advantage for an unspecified simulation
+task; precision, input preparation, implementation cost, and classical methods
+must be included in the comparison.
 
 In contrast, VQE addresses the NISQ constraint by dividing the computational workload between a quantum processor and a classical computer:
 
@@ -67,11 +78,17 @@ $$
 E_0 \le \min_{\vec{\theta}} \langle \psi(\vec{\theta}) | H | \psi(\vec{\theta}) \rangle
 $$
 
+The ansatz minimum equals E0 only if the family can represent a ground state.
+A classical optimizer need not find that minimum. The variational bound applies
+to the exact expectation of a physical state; a noisy finite-sample estimate
+or a mitigated estimator can fall below it due to estimation error.
+
 ---
 
 ## 3. Pauli String Decomposition
 
-Quantum hardware cannot measure an arbitrary matrix $H$ directly in a single operation. Instead, any $n$-qubit Hamiltonian is decomposed into a linear combination of tensor products of Pauli matrices (**Pauli strings**):
+A practical approach for gate-based devices is to decompose an n-qubit
+Hamiltonian into tensor products of Pauli matrices (**Pauli strings**):
 
 $$
 H = \sum_{i=1}^M c_i P_i, \qquad c_i \in \mathbb{R}, \quad P_i \in \{I, X, Y, Z\}^{\otimes n}
@@ -85,11 +102,13 @@ $$
 
 ### Measuring Pauli Observables
 
-Each Pauli string $P_i$ is measured independently on the quantum device:
+Pauli terms may be estimated separately; compatible terms can sometimes be
+grouped into shared measurement settings. For an individual qubit:
 
 1. **$Z$-basis:** Measured directly in the standard computational basis.
 2. **$X$-basis:** Apply a Hadamard gate $H$ before measurement ($H Z H = X$).
-3. **$Y$-basis:** Apply $S^\dagger H$ before measurement ($S^\dagger H Z H S = Y$).
+3. **$Y$-basis:** Apply $S^\dagger$ first, then H. The total basis-change
+   operator is $B=HS^\dagger$, so $B^\dagger ZB=SHZHS^\dagger=Y$.
 
 The classical computer sums the weighted measurement results to compute the total energy $E(\vec{\theta})$.
 
@@ -114,36 +133,49 @@ $$
 U(\vec{\theta}) = \exp(T(\vec{\theta}) - T^\dagger(\vec{\theta}))
 $$
 
-- **Advantage:** Preserves total electron number and spin symmetries; systematically approaches chemical accuracy ($1\ \text{kcal/mol}$).
+- **Advantage:** Number-conserving excitations and appropriate restrictions can
+  encode physical symmetries. Truncating to singles and doubles does not
+  guarantee a specified chemical accuracy for every system.
 - **Disadvantage:** Requires deep circuits when compiled into standard gates via Trotterization.
 
 ### The Barren Plateau Phenomenon
 
-In 2018, McClean et al. proved that for deep, randomly initialized parameterized quantum circuits, the variance of the energy gradient vanishes exponentially with the number of qubits $n$:
+[McClean et al. (2018)](https://arxiv.org/abs/1803.11173) establish exponentially
+small gradient variance for the random-circuit ensembles and assumptions they
+study. A schematic scaling in such a regime is:
 
 $$
 \operatorname{Var}\left( \frac{\partial E}{\partial \theta_k} \right) \in O\left( \frac{1}{2^n} \right)
 $$
 
-This causes gradient-based optimizers to stall because the cost landscape becomes featureless and flat everywhere.
+This can make typical gradients difficult to resolve. It does not mean every
+ansatz has the same scaling, or that the cost function is literally constant
+everywhere. Depth, initialization distribution, and observable all matter.
 
 **Mitigation strategies include:**
 - Using shallow, hardware-efficient layouts
 - Local cost functions rather than global observables
-- Identity initialization (starting near $\vec{\theta} = \vec{0}$)
+- Structured near-identity initialization when the ansatz permits it; setting
+  every parameter to zero does not by itself guarantee the identity circuit
 - Symmetry-preserving and problem-tailored ansaetze
 
 ---
 
 ## 5. The Parameter-Shift Rule for Exact Gradients
 
-In classical neural networks, gradients are computed efficiently using automatic differentiation (backpropagation). On a quantum computer, measuring intermediate states collapses the wave function, ruling out backpropagation.
+Classical simulators can differentiate through state evolution. A hardware
+device does not expose its state amplitudes for classical backpropagation;
+gradients must instead be obtained through suitable measurement procedures.
 
-Numerical finite differences $\frac{E(\theta + \epsilon) - E(\theta)}{\epsilon}$ fail on quantum hardware because quantum measurement has intrinsic shot noise, which dominates when $\epsilon$ is small.
+Finite differences remain possible, but dividing noisy estimates by a small
+epsilon amplifies sampling error and introduces a truncation-error tradeoff.
 
-The solution is the **Parameter-Shift Rule** (Mitarai et al., 2018; Schuld et al., 2019):
+For appropriate gates, the **Parameter-Shift Rule** avoids this small-step
+tradeoff: see [Mitarai et al.](https://arxiv.org/abs/1803.00745) and
+[Schuld et al.](https://arxiv.org/abs/1811.11184).
 
-For any quantum gate generated by a Pauli operator $G = e^{-i \theta P / 2}$ with $P^2 = I$ (e.g. $R_x(\theta), R_y(\theta), R_z(\theta)$), the **exact analytical gradient** is given by:
+For a single parameter occurrence in a gate $G=e^{-i\theta P/2}$ with
+Hermitian $P^2=I$, with all other gates fixed, the exact expectation satisfies:
 
 $$
 \frac{\partial E}{\partial \theta} = \frac{E\left(\theta + \frac{\pi}{2}\right) - E\left(\theta - \frac{\pi}{2}\right)}{2}
@@ -175,13 +207,19 @@ $$
 \frac{d}{d\theta} \left( e^{i \theta P / 2} O e^{-i \theta P / 2} \right) = -\frac{\sin\theta}{2}(O - P O P) + \frac{\cos\theta}{2} i [P, O]
 $$
 
-Evaluating the difference with shifts of $\pm \pi/2$:
+Define $A(\theta)=e^{i\theta P/2}Oe^{-i\theta P/2}$. At the operator level:
 
 $$
-\frac{E(\theta + \pi/2) - E(\theta - \pi/2)}{2} = -\frac{\sin\theta}{2}(O - P O P) + \frac{\cos\theta}{2} i [P, O] = \frac{\partial E}{\partial \theta}
+\frac{A(\theta+\pi/2)-A(\theta-\pi/2)}2
+=-\frac{\sin\theta}{2}(O-POP)+\frac{i\cos\theta}{2}[P,O]
+=\frac{dA}{d\theta}.
 $$
 
-This remarkable formula allows evaluating exact analytic gradients on real quantum computers by measuring two macroscopic shifts of $\pm \pi/2$, completely avoiding finite-difference instabilities!
+Taking the expectation in $W|0\rangle$ gives the scalar energy-gradient
+formula above. Finite-shot evaluations still have statistical uncertainty.
+If a shared parameter appears in several gates, differentiate each occurrence
+and sum its contribution; the two-evaluation formula is not automatically
+valid for the entire shared-parameter circuit.
 
 ---
 
@@ -234,7 +272,7 @@ At $\theta = \pi$: $\frac{\partial E}{\partial \theta} = -\sin(\pi) = 0$, confir
 
 ## 7. Python Implementation with NumPy & PennyLane
 
-### NumPy Grid Search & Analytic Optimization
+### NumPy Parameter-Shift Optimization
 
 ```python
 import numpy as np
@@ -264,6 +302,7 @@ print(f"Calculated Ground Energy: {energy(theta):.4f} (target: -1.0000)")
 
 ```python
 import pennylane as qml
+from pennylane import numpy as pnp
 
 dev = qml.device("default.qubit", wires=1)
 
@@ -273,12 +312,14 @@ def circuit(theta):
     return qml.expval(qml.PauliZ(0))
 
 opt = qml.GradientDescentOptimizer(stepsize=0.4)
-theta = 0.2
+theta = pnp.array(0.2, requires_grad=True)
 
 for _ in range(25):
     theta, cost = opt.step_and_cost(circuit, theta)
 
-print(f"PennyLane optimized theta: {theta:.4f}, Energy: {cost:.4f}")
+# step_and_cost returns the cost before its update; evaluate the final point.
+final_energy = float(circuit(theta))
+print(f"PennyLane optimized theta: {float(theta):.4f}, Energy: {final_energy:.4f}")
 ```
 
 ---
@@ -287,11 +328,15 @@ print(f"PennyLane optimized theta: {theta:.4f}, Energy: {cost:.4f}")
 
 The $H = Z$ VQE instance is implemented across all five ecosystems:
 
-- [NumPy Implementation](https://github.com/cicixgliamici/quantum_ed/blob/main/experiments/variational-quantum-eigensolver/numpy/variational_quantum_eigensolver.py)
-- [Qiskit Circuit](https://github.com/cicixgliamici/quantum_ed/blob/main/experiments/variational-quantum-eigensolver/qiskit/variational_quantum_eigensolver.py)
-- [PennyLane QNode](https://github.com/cicixgliamici/quantum_ed/blob/main/experiments/variational-quantum-eigensolver/pennylane/variational_quantum_eigensolver.py)
-- [Q# Program](https://github.com/cicixgliamici/quantum_ed/blob/main/experiments/variational-quantum-eigensolver/qsharp/VariationalQuantumEigensolver.qs)
-- [OpenQASM 3](https://github.com/cicixgliamici/quantum_ed/blob/main/experiments/variational-quantum-eigensolver/openqasm/variational_quantum_eigensolver.qasm)
+The Python versions evaluate and optimize the energy. Q# and OpenQASM expose
+the optimal ansatz preparation only; they do not implement a classical
+optimization loop. This is an educational instance, not an advantage claim.
+
+- [NumPy Implementation](https://github.com/cicixgliamici/quantum_ed/blob/main/experiments/variational-quantum-eigensolver/numpy/vqe.py)
+- [Qiskit Circuit](https://github.com/cicixgliamici/quantum_ed/blob/main/experiments/variational-quantum-eigensolver/qiskit/vqe.py)
+- [PennyLane QNode](https://github.com/cicixgliamici/quantum_ed/blob/main/experiments/variational-quantum-eigensolver/pennylane/vqe.py)
+- [Q# Program](https://github.com/cicixgliamici/quantum_ed/blob/main/experiments/variational-quantum-eigensolver/qsharp/VQEAnsatz.qs)
+- [OpenQASM 3](https://github.com/cicixgliamici/quantum_ed/blob/main/experiments/variational-quantum-eigensolver/openqasm/vqe_ansatz.qasm)
 
 ---
 
@@ -339,7 +384,9 @@ $$
 The eigenvalues of $H$ in the invariant subspace $\{|00\rangle, |10\rangle\}$ are roots of $\det \begin{bmatrix} -1-\lambda & -1 \\ -1 & 1-\lambda \end{bmatrix} = \lambda^2 - 1 - 1 = \lambda^2 - 2 = 0 \implies \lambda = \pm\sqrt{2}$.
 
 The true ground state energy is $E_0 = -\sqrt{2} \approx -1.414 < -1$.
-A VQE ansatz that introduces superposition with $R_y$ can reach $E_0 = -\sqrt{2}$, strictly outperforming the classical state $|00\rangle$.
+A suitable Ry trial state can reach $E_0=-\sqrt2$, below the energy of the
+particular basis state `00`. This tiny example is also solved by ordinary
+classical matrix diagonalization, so this comparison is not quantum advantage.
 
 ---
 

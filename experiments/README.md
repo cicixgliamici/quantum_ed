@@ -43,6 +43,14 @@ convention, implementation links, and execution instructions.
 
 ## Experiment contract
 
+Scientific checks execute all five ecosystems against common analytical
+references, with explicit wire ordering, relative-phase checks, and statistical
+sampling bounds. See the [validation protocol](../docs/reference/experiment-validation.md).
+
+```bash
+python tools/validate_experiments.py --ecosystem numpy qiskit pennylane openqasm qsharp
+```
+
 Every experiment contains an `experiment.json` manifest conforming to
 [`schema.json`](schema.json). The manifest declares its theory page, expected
 result, category, and one entrypoint for each supported ecosystem. Validate all

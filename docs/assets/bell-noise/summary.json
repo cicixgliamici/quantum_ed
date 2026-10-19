@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "models": [
+    "numpy",
+    "pennylane"
+  ],
+  "channels": [
+    "dephasing",
+    "depolarizing",
+    "amplitude_damping"
+  ],
+  "points_per_channel": 101,
+  "states_checked": 606,
+  "simulation": "exact density matrices; independent identical local channels; one application per wire",
+  "wire_order": "q0 q1",
+  "absolute_tolerance": 1e-10,
+  "theory_matrix_max_abs_error": 2.0095036745715333e-14,
+  "theory_metric_max_abs_error": 4.030109579389318e-14,
+  "framework_matrix_max_abs_error": 2.0317081350640365e-14,
+  "depolarizing_transition": {
+    "analytical_threshold": 0.42264973081037416,
+    "grid_last_entangled": 0.42,
+    "grid_first_numerically_separable": 0.43
+  },
+  "environment": {
+    "python": "3.14.3",
+    "packages": {
+      "numpy": "2.3.5",
+      "scipy": "1.17.1",
+      "matplotlib": "3.10.8",
+      "pennylane": "0.45.1"
+    }
+  },
+  "command": "python -m studies.bell_noise.run_study",
+  "parameters": {
+    "points": 101,
+    "numpy_only": false
+  }
+}

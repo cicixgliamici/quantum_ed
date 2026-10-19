@@ -9,72 +9,143 @@ permissions:
 
 jobs:
   core:
-    name: Core Python and repository contracts
-    runs-on: ubuntu-latest
+    name: Core / ${{ matrix.os }} / Python ${{ matrix.python }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ["3.11", "3.12", "3.13", "3.14"]
+    env:
+      # Keep every uv command on this interpreter, overriding .python-version.
+      UV_PYTHON: ${{ matrix.python }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
-          cache: pip
-      - name: Install core development dependencies
-        run: python -m pip install -e ".[dev]"
-      - name: Validate repository structure and links
-        run: python tools/verify_repository.py
-      - name: Execute NumPy experiment entrypoints
-        run: python tools/validate_numpy.py
+          python-version: ${{ matrix.python }}
+      - name: Install the pinned environment manager
+        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with:
+          version-file: pyproject.toml
+          enable-cache: true
+          cache-suffix: core-${{ matrix.python }}
+      - name: Install the locked package as a wheel
+        run: uv sync --locked --python ${{ matrix.python }} --extra test --no-editable
+      - name: Check dependency consistency
+        run: uv pip check --python .venv
+      - name: Record the actual environment and verify installation
+        run: uv run --no-sync python -I tools/environment_report.py --require-wheel --output build/reproducibility/environment.json
+      - name: Validate repository structure and source links
+        run: uv run --no-sync python tools/verify_repository.py
+      - name: Validate NumPy experiments
+        run: uv run --no-sync python tools/validate_experiments.py --ecosystem numpy
       - name: Run core tests
-        run: python -m pytest -q
+        run: uv run --no-sync python -m pytest -q --junitxml=build/reproducibility/tests.xml
+      - name: Reproduce the analytical Bell-noise study
+        run: uv run --no-sync python -m studies.bell_noise.run_study --numpy-only --output-dir build/bell-noise-numpy
+      - name: Preserve verification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: core-${{ runner.os }}-py${{ matrix.python }}
+          path: |
+            build/reproducibility/
+            build/bell-noise-numpy/
 
   qiskit:
-    name: Qiskit experiments
+    name: Qiskit / Python ${{ matrix.python }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.11", "3.14.3"]
+    env:
+      UV_PYTHON: ${{ matrix.python }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
-          cache: pip
-      - name: Install Qiskit and test dependencies
-        run: python -m pip install -e ".[dev,showcase]"
-      - name: Test Qiskit experiment behavior
-        run: python -m pytest -q tests/experiments
-      - name: Execute Qiskit entrypoints
-        shell: bash
-        run: |
-          find experiments -path "*/qiskit/*.py" -print0 |
-            sort -z |
-            xargs -0 -n1 python
+          python-version: ${{ matrix.python }}
+      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with:
+          version-file: pyproject.toml
+          enable-cache: true
+          cache-suffix: qiskit-${{ matrix.python }}
+      - name: Install locked Qiskit dependencies
+        run: uv sync --locked --python ${{ matrix.python }} --extra test --extra showcase --no-editable
+      - run: uv pip check --python .venv
+      - run: uv run --no-sync python -I tools/environment_report.py --require-wheel
+      - name: Validate Qiskit results and sampling
+        run: uv run --no-sync python tools/validate_experiments.py --ecosystem qiskit
+      - name: Test Qiskit behavior
+        run: uv run --no-sync python -m pytest -q tests/experiments --junitxml=build/reproducibility/tests.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: qiskit-py${{ matrix.python }}
+          path: build/reproducibility/
 
   openqasm:
-    name: OpenQASM 3 syntax
+    name: OpenQASM / Python ${{ matrix.python }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.11", "3.14.3"]
+    env:
+      UV_PYTHON: ${{ matrix.python }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
-          cache: pip
-      - name: Install the OpenQASM reference importer
-        run: python -m pip install -e ".[openqasm]"
-      - name: Parse declared OpenQASM programs
-        run: python tools/validate_openqasm.py
+          python-version: ${{ matrix.python }}
+      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with:
+          version-file: pyproject.toml
+          enable-cache: true
+          cache-suffix: openqasm-${{ matrix.python }}
+      - run: uv sync --locked --python ${{ matrix.python }} --extra openqasm --no-editable
+      - run: uv pip check --python .venv
+      - run: uv run --no-sync python -I tools/environment_report.py --require-wheel
+      - name: Execute OpenQASM programs and verify results
+        run: uv run --no-sync python tools/validate_openqasm.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: openqasm-py${{ matrix.python }}
+          path: build/reproducibility/
 
   qsharp:
-    name: Q# compilation
+    name: Q# / Python ${{ matrix.python }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.11", "3.14.3"]
     env:
       QDK_PYTHON_TELEMETRY: none
+      UV_PYTHON: ${{ matrix.python }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
-          cache: pip
-      - name: Install the Microsoft QDK
-        run: python -m pip install -e ".[qsharp]"
-      - name: Compile declared Q# programs
-        run: python tools/validate_qsharp.py
+          python-version: ${{ matrix.python }}
+      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with:
+          version-file: pyproject.toml
+          enable-cache: true
+          cache-suffix: qsharp-${{ matrix.python }}
+      - run: uv sync --locked --python ${{ matrix.python }} --extra qsharp --no-editable
+      - run: uv pip check --python .venv
+      - run: uv run --no-sync python -I tools/environment_report.py --require-wheel
+      - name: Execute Q# programs and verify probabilities and phases
+        run: uv run --no-sync python tools/validate_qsharp.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: qsharp-py${{ matrix.python }}
+          path: build/reproducibility/
 
   notebooks:
     name: Reproducible notebooks
@@ -83,16 +154,28 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
-          cache: pip
-      - name: Install notebook dependencies
-        run: python -m pip install -e ".[notebooks]"
+          python-version-file: .python-version
+      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with:
+          version-file: pyproject.toml
+          enable-cache: true
+          cache-suffix: notebooks
+      - run: uv sync --locked --extra notebooks --no-editable
+      - run: uv pip check --python .venv
+      - run: uv run --no-sync python -I tools/environment_report.py --require-wheel
       - name: Execute clean notebook copies
         run: |
-          mkdir -p /tmp/quantum-ed-notebooks
-          python -m jupyter nbconvert --to notebook --execute notebooks/*.ipynb \
-            --output-dir /tmp/quantum-ed-notebooks \
+          mkdir -p build/executed-notebooks
+          uv run --no-sync python -m jupyter nbconvert --to notebook --execute notebooks/*.ipynb \
+            --output-dir build/executed-notebooks \
             --ExecutePreprocessor.timeout=120
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: notebook-reproduction
+          path: |
+            build/reproducibility/
+            build/executed-notebooks/
 
   documentation:
     name: Documentation site
@@ -101,27 +184,56 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
-          cache: pip
-      - name: Install documentation dependencies
-        run: python -m pip install -e ".[docs]"
+          python-version-file: .python-version
+      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with:
+          version-file: pyproject.toml
+          enable-cache: true
+          cache-suffix: documentation
+      - run: uv sync --locked --extra docs --no-editable
+      - run: uv pip check --python .venv
+      - run: uv run --no-sync python -I tools/environment_report.py --require-wheel
       - name: Build the documentation site
-        run: python -m mkdocs build --strict
+        run: uv run --no-sync python -m mkdocs build --strict
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: documentation-environment
+          path: build/reproducibility/
 
   pennylane:
-    name: PennyLane experiments and noise study
+    name: PennyLane / Python ${{ matrix.python }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.11", "3.14.3"]
+    env:
+      UV_PYTHON: ${{ matrix.python }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
-          cache: pip
-      - name: Install PennyLane and test dependencies
-        run: python -m pip install -e ".[dev,pennylane]"
-      - name: Execute PennyLane entrypoints
-        run: python tools/validate_pennylane.py
-      - name: Compare ideal and noisy models
-        run: python studies/ideal-vs-noisy/pennylane_model.py
-      - name: Run ecosystem tests
-        run: python -m pytest -q tests/experiments
+          python-version: ${{ matrix.python }}
+      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with:
+          version-file: pyproject.toml
+          enable-cache: true
+          cache-suffix: pennylane-${{ matrix.python }}
+      - run: uv sync --locked --python ${{ matrix.python }} --extra test --extra pennylane --no-editable
+      - run: uv pip check --python .venv
+      - run: uv run --no-sync python -I tools/environment_report.py --require-wheel
+      - name: Validate PennyLane scientific results
+        run: uv run --no-sync python tools/validate_experiments.py --ecosystem pennylane
+      - name: Reproduce the full Bell-noise comparison
+        run: uv run --no-sync python -m studies.bell_noise.run_study --output-dir build/bell-noise-comparison
+      - name: Run ecosystem and study tests
+        run: uv run --no-sync python -m pytest -q tests/experiments tests/studies --junitxml=build/reproducibility/tests.xml
+      - name: Preserve cross-framework evidence
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pennylane-py${{ matrix.python }}
+          path: |
+            build/reproducibility/
+            build/bell-noise-comparison/

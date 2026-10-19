@@ -1,314 +1,265 @@
 # Quantum Hardware & Physical Qubits
 
-In theoretical quantum information, quantum algorithms are expressed in terms of ideal state vectors, arbitrary unitary operators, and all-to-all connectivity. In reality, a quantum processor is a delicate physical apparatus operating at the boundaries of experimental physics and nanotechnology.
+Hardware constrains how an ideal circuit is implemented: qubits lose coherence,
+gates and readout are imperfect, interactions have limited connectivity, and
+states can leak outside the computational subspace. This chapter separates
+physical mechanisms, conditional estimates, and mathematical identities.
 
-A physical quantum computer is subject to:
+Numerical examples below are **illustrative assumptions**, not a comparison of
+current commercial processors. Experimental values require a named device,
+measurement protocol, operating conditions, and a dated source.
 
-- **Finite coherence times** ($T_1, T_2$)
-- **Imperfect gate control** and control pulse distortions
-- **Readout (SPAM) infidelities**
-- **Topological connectivity constraints** on coupling graphs
-- **Crosstalk and leakage** outside the two-level computational subspace
+## 1. Requirements for physical quantum computing
 
-Understanding these hardware realities is essential for designing efficient quantum algorithms, optimizing circuit transpilation, and planning the transition from the NISQ era to Fault-Tolerant Quantum Computing (FTQC).
+[DiVincenzo (2000)](https://arxiv.org/abs/quant-ph/0002077) describes five
+requirements for quantum computation:
 
----
+1. Scalable, well-characterized qubits.
+2. Initialization into a known fiducial state.
+3. Relevant coherence times long compared with operation times.
+4. A universal set of quantum gates.
+5. Qubit-specific measurement.
 
-## 1. The DiVincenzo Criteria
+Quantum communication adds interfaces between stationary and flying qubits,
+and transmission of flying qubits. The criteria do not impose one universal
+reset fidelity or one fixed ratio of coherence time to gate duration.
 
-In 1996 and 2000, theoretical physicist David DiVincenzo formulated the five necessary criteria that any physical system must satisfy to implement a viable quantum computer:
+## 2. Physical encodings and engineering tradeoffs
 
-1. **A scalable physical system with well-characterized qubits:**
-   The physical two-level quantum system must be precisely defined, with clear energy levels $\{|0\rangle, |1\rangle\}$ isolated from higher excited states, and capable of scaling to large numbers of qubits.
-2. **The ability to initialize the state of the qubits to a simple fiducial state:**
-   The register must be quickly and reliably initialized into a known fiducial state (typically $|00\dots 0\rangle$) with high fidelity ($>99.9\%$), either through active reset or thermal equilibration.
-3. **Long relevant decoherence times, much longer than gate operation times:**
-   The system must satisfy:
+| Modality | Encoding and control | Constraints to investigate |
+| --- | --- | --- |
+| Superconducting transmons | Anharmonic Josephson circuits, microwave control, coupled resonators | Cryogenic control, relaxation, dephasing, leakage, coupling layout |
+| Trapped ions | Hyperfine, Zeeman, or optical states; laser or microwave control | Motional modes, addressing, transport, optical control, gate scheduling |
+| Neutral atoms | Long-lived atomic states with Rydberg-mediated interactions | Atom loss, excitation errors, interaction range, motion and addressing |
+| Photonics | Photons encoded in modes such as path or polarization | Loss, indistinguishability, source and detector efficiency, probabilistic operations |
+| Semiconductor spins | Electron or hole spins in quantum dots or donor systems | Charge noise, control uniformity, exchange tuning, readout and interconnects |
 
-$$
-\frac{T_1, T_2}{t_{\mathrm{gate}}} \gg 10^3\text{--}10^4
-$$
+Background sources are [Krantz et al. (2019)](https://arxiv.org/abs/1904.06560),
+[Bruzewicz et al. (2019)](https://arxiv.org/abs/1904.04178),
+[Saffman et al. (2009 preprint; 2010 review)](https://arxiv.org/abs/0909.4777),
+[Rudolph (2016)](https://arxiv.org/abs/1607.08535), and
+[Burkard et al. (2021 preprint)](https://arxiv.org/abs/2112.08863), respectively.
+These are background descriptions, not a live performance ranking.
 
-   allowing thousands of coherent gate operations before environmental noise randomizes quantum phases.
-4. **A universal set of quantum gates:**
-   The hardware must support arbitrary single-qubit rotations and an entangling two-qubit gate (such as CNOT, CZ, or iSWAP) to synthesize any unitary transformation.
-5. **A qubit-specific measurement capability:**
-   The processor must measure individual qubits in the computational basis with high quantum efficiency and low cross-talk, without destroying or disturbing unmeasured qubits.
+Several distinctions matter when reading a specification. Atomic ground-state
+coherence is not the lifetime of a Rydberg excitation. An ion trap's environment
+temperature is not an ion's motional temperature. Photon propagation does not
+imply infinite coherence or instantaneous gates: loss, mode mismatch, delays,
+and detection remain physical limitations. Connectivity within one ion chain
+also does not imply unconstrained simultaneous entangling operations.
 
-*(Two additional criteria apply to quantum communication: the ability to interconvert stationary and flying qubits, and the ability to faithfully transmit flying qubits between distant nodes).*
+## 3. Coherence times describe a model, not a hard gate count
 
----
-
-## 2. Leading Physical Qubit Modalities
-
-Several physical implementations are actively pursued, each representing distinct engineering tradeoffs between gate speed, coherence duration, fidelity, and manufacturing maturity.
-
-| Qubit Modality | Physical Carrier | 1-Qubit Gate Time | 2-Qubit Gate Time | Coherence $T_2$ | 2-Qubit Fidelity | Native Connectivity | Operating Temp |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Superconducting (Transmon)** | Josephson junction non-linear LC oscillator | $10\text{--}30\ \text{ns}$ | $50\text{--}200\ \text{ns}$ | $50\text{--}300\ \mu\text{s}$ | $99.0\text{--}99.8\%$ | Nearest-neighbor (planar grid) | $\sim 15\ \text{mK}$ |
-| **Trapped Ions** | Hyperfine states of ions ($^{171}\text{Yb}^+, ^{40}\text{Ca}^+$) | $1\text{--}10\ \mu\text{s}$ | $50\text{--}200\ \mu\text{s}$ | $1\text{--}10\ \text{s}$ | $99.5\text{--}99.9\%$ | All-to-all (within trap) | Room / $4\ \text{K}$ |
-| **Neutral Atoms** | Rydberg states in optical tweezer arrays | $10\text{--}50\ \text{ns}$ | $100\text{--}400\ \text{ns}$ | $1\text{--}5\ \text{s}$ | $99.0\text{--}99.5\%$ | Reconfigurable 2D/3D | Ultra-cold ($\sim \mu\text{K}$) |
-| **Photonics** | Single photons in spatial/polarization modes | Instantaneous | Probabilistic / Fusion | $\infty$ (flying) | Variable | Reconfigurable waveguides | Room temp (detectors at $4\ \text{K}$) |
-| **Silicon Spin** | Electron/hole spins in semiconductor quantum dots | $10\text{--}50\ \text{ns}$ | $50\text{--}200\ \text{ns}$ | $1\text{--}10\ \text{ms}$ | $98.0\text{--}99.5\%$ | Nearest-neighbor | $\sim 1\ \text{K}$ |
-
-### 1. Superconducting Transmon Qubits
-- **Operating Principle:** An LC circuit where the classical inductor is replaced by a **Josephson junction** (a thin insulating barrier between two superconducting aluminum layers). The non-linear Josephson inductance creates an anharmonic potential, separating the transition frequency $\omega_{01}$ from $\omega_{12}$ by an anharmonicity $\Delta = \omega_{12} - \omega_{01} \approx -200\text{ to } -350\ \text{MHz}$. This isolates the $\{|0\rangle, |1\rangle\}$ subspace.
-- **Strengths:** Fast gate speeds ($10\text{--}100\ \text{ns}$), fabricated using established solid-state lithography, mature microwave engineering.
-- **Challenges:** Requires dilution refrigerators ($\sim 15\ \text{mK}$), cryogenic microwave coaxial wiring bottlenecks, planar connectivity limitations, and material two-level system (TLS) defects.
-
-### 2. Trapped Ion Qubits
-- **Operating Principle:** Individual atomic ions are levitated in ultra-high vacuum using radio-frequency Paul traps. Qubits are encoded in stable electronic hyperfine ground states and addressed with focused laser beams. Two-qubit entangling gates are mediated by Coulomb repulsion (shared motional phonon modes, e.g. Mølmer-Sørensen gate).
-- **Strengths:** Natural, identical quantum emitters (zero manufacturing variance), exceptional coherence times ($T_2 > 1\ \text{s}$), highest recorded 2-qubit gate fidelities ($>99.9\%$), and full all-to-all connectivity within a single trap.
-- **Challenges:** Slower gate speeds ($10\text{--}100\ \mu\text{s}$), optical control scaling, laser phase noise, and limits on ion chain length before motional modes become crowded.
-
-### 3. Neutral Atom Qubits (Rydberg Arrays)
-- **Operating Principle:** Hundreds of individual neutral atoms are held in arbitrary 2D/3D configurations using optical tweezers (tightly focused laser beams). Laser excitation to high-lying **Rydberg states** (principal quantum number $n \approx 50\text{--}100$) induces a massive electric dipole moment, creating a **Rydberg blockade** that prevents simultaneous excitation of neighboring atoms within a blockade radius $R_b \approx 5\text{--}10\ \mu\text{m}$, directly implementing entangling gates.
-- **Strengths:** Rapidly scalable to thousands of qubits in clean optical lattices, dynamically reconfigurable connectivity via physical atom shuttling during circuit execution.
-- **Challenges:** Finite trap vacuum lifetime (atoms occasionally lost), optical intensity noise, finite Rydberg lifetime.
-
----
-
-## 3. Hardware Error Budgeting
-
-In any quantum algorithm, total circuit error is a composite sum of distinct physical error channels:
+For a qubit with stationary exponential relaxation and independent exponential
+pure dephasing, in a frame removing ideal phase rotation:
 
 $$
-\epsilon_{\mathrm{circuit}} \approx 1 - \prod_{g \in \text{gates}} (1 - \epsilon_g) \prod_{q \in \text{qubits}} (1 - \epsilon_{\mathrm{SPAM}})
+\rho_{11}(t)=\rho_{11}(0)e^{-t/T_1},\qquad
+\rho_{01}(t)=\rho_{01}(0)e^{-t/T_2},\qquad
+\frac1{T_2}=\frac1{2T_1}+\frac1{T_\phi}.
 $$
 
-### Single-Qubit vs Two-Qubit Gate Bottlenecks
+This zero-temperature relaxation model gives $T_2\le2T_1$. A nonexponential
+Ramsey envelope, echo experiment, driven gate, or changing environment requires
+its own model; fitted times should not be substituted indiscriminately.
+See the coherence discussion in [Krantz et al.](https://arxiv.org/abs/1904.06560)
+and the [channel definitions](../07-noise-and-channels/README.md).
 
-- **Single-Qubit Gate Error ($\epsilon_{1Q} \sim 10^{-4}\text{--}10^{-3}$):** Fast pulses (e.g. $20\ \text{ns}$ microwave drive) with low error.
-- **Two-Qubit Gate Error ($\epsilon_{2Q} \sim 10^{-2}\text{--}10^{-3}$):** The dominant error source in modern processors. Because entangling gates require physical interaction between qubits, they take $5\times$ to $20\times$ longer than single-qubit gates, exposing both qubits to environmental decoherence ($T_1, T_2$) during the operation.
-
-### Coherence-Limited Circuit Depth
-
-The maximum number of coherent gate layers $D_{\max}$ a device can sustain before quantum information is destroyed by dephasing is bounded by:
-
-$$
-D_{\max} \le \frac{T_2}{t_{\mathrm{gate}}}
-$$
-
-For a typical superconducting transmon with $T_2 = 100\ \mu\text{s}$ and two-qubit gate duration $t_{2Q} = 200\ \text{ns}$:
+Assume each sequential layer lasts $t_{\rm layer}$ and coherence follows the
+same undriven exponential throughout. The remaining coherence contrast is:
 
 $$
-D_{\max} \le \frac{100\ \mu\text{s}}{0.2\ \mu\text{s}} = 500\ \text{layers}
+C(D)=\frac{|\rho_{01}(D t_{\rm layer})|}{|\rho_{01}(0)|}
+=e^{-D t_{\rm layer}/T_2}.
 $$
 
-In practice, because gate infidelities ($\epsilon_{2Q} \approx 1\%$) accumulate exponentially, circuit fidelity drops below $50\%$ after only $\sim 70$ two-qubit gates without error correction:
+For an explicitly chosen contrast target $0<C_{\min}<1$:
 
 $$
-F_{\mathrm{alg}} \approx (1 - 0.01)^{70} \approx 0.494
+D\le-\frac{T_2}{t_{\rm layer}}\ln C_{\min}.
 $$
 
-### SPAM Errors (State Preparation and Measurement)
+**Example:** assume $T_2=100\,\mu\mathrm{s}$ and
+$t_{\rm layer}=200\,\mathrm{ns}$. Their ratio is 500, an e-folding scale:
+at 500 layers contrast is $e^{-1}\approx0.368$, rather than abruptly zero.
+Requiring at least half the initial contrast allows at most
+$\lfloor500\ln2\rfloor=346$ complete layers under these assumptions.
+This is a coherence estimate, not circuit fidelity or a device-wide depth limit.
 
-Even if a circuit executes flawlessly, measurement results can be corrupted:
+For example, the integer layer count can be reproduced with
+`int(np.floor(-(100e-6 / 200e-9) * np.log(0.5)))` after importing NumPy.
 
-- **State Preparation Infidelity:** Residual thermal excitations leave a small fraction of qubits in state $|1\rangle$ instead of $|0\rangle$ during reset.
-- **Readout Infidelity:** Dispersive readout (measuring microwave transmission shift through a coupled resonator) has finite signal-to-noise ratio (SNR), leading to misclassification:
-  - $P(1|0)$: probability of measuring $|1\rangle$ when the state was $|0\rangle$.
-  - $P(0|1)$: probability of measuring $|0\rangle$ when the state was $|1\rangle$.
+## 4. Gate infidelity, state fidelity, and fault probabilities
 
-#### Readout Error Mitigation (REM)
+| Quantity | Meaning |
+| --- | --- |
+| State fidelity with a pure target | $F_\psi=\langle\psi|\rho|\psi\rangle$ for one output state |
+| Average gate fidelity | Average state overlap of an implemented channel with its target unitary over pure inputs |
+| No-fault probability | Probability that no specified stochastic fault occurs in a chosen noise model |
+| Task success probability | Probability of satisfying the algorithm's output criterion |
 
-Readout error can be partially corrected via calibration. Experimentally measure the **confusion matrix** $M$:
+These quantities cannot generally be interchanged. For example, a stochastic
+Z error on the input `0` leaves that state unchanged: state fidelity remains
+one even though the no-fault probability is less than one.
+
+For the particular d-dimensional depolarizing model
+$\mathcal E_p(\rho)=(1-p)\rho+pI/d$, overlap with any pure input is
+$1-p+p/d$, so average gate infidelity is $r=p(d-1)/d$. Thus even here r is
+not p. General gate-fidelity definitions and their relation to entanglement
+fidelity are given by [Nielsen (2002)](https://arxiv.org/abs/quant-ph/0205035).
+
+### A conditional stochastic error budget
+
+Assume independent faults, with specified probabilities $p_g$ per operation
+and $p_q^{\rm readout}$ per measured bit. In this selected model:
 
 $$
-M = \begin{bmatrix} P(0|0) & P(0|1) \\ P(1|0) & P(1|1) \end{bmatrix}
+P_{\rm no\ fault}=\prod_g(1-p_g)\prod_q(1-p_q^{\rm readout}).
 $$
 
-Given the observed noisy probability distribution $\vec{P}_{\mathrm{meas}}$, the mitigated ideal distribution $\vec{P}_{\mathrm{ideal}}$ is obtained by matrix inversion:
+It is not obtained by multiplying arbitrary reported average gate fidelities.
+Faults may cancel, commute with the prepared state, or affect the task in
+different ways; coherent and correlated errors need different treatment.
+
+**Worked example:** assign fault probabilities 0.001 to each of 50 single-qubit
+operations, 0.015 to each of 20 two-qubit operations, and 0.02 to each of four
+readout bits. Preparation is assumed ideal. The exact product is:
 
 $$
-\vec{P}_{\mathrm{ideal}} = M^{-1} \vec{P}_{\mathrm{meas}}
+P_{\rm no\ fault}=0.999^{50}\,0.985^{20}\,0.98^4
+\approx0.64849006.
 $$
 
-### Crosstalk and Leakage
+The three factors are approximately 0.95120563, 0.73913643, and 0.92236816.
+The approximation $(1-p)^n\approx e^{-np}$ is useful only when its error is
+acceptable; using it for the first two factors gives approximately 0.64998186,
+not the exact product. This calculation estimates no-fault probability only.
 
-1. **Crosstalk:** Applying microwave control tones to drive qubit $A$ induces stray electromagnetic fields that weakly drive neighboring qubit $B$, shifting its transition frequency or rotating its state.
-2. **Subspace Leakage:** The transmon is not a perfect two-level system; it is an anharmonic oscillator with higher excited states $|2\rangle, |3\rangle, \dots$. Strong, fast microwave pulses have finite frequency bandwidth that can drive transitions $|1\rangle \to |2\rangle$. Once leaked, the state falls outside the computational basis and standard quantum error correction codes cannot directly correct it.
+Likewise, $0.99^{70}\approx0.49483866$ describes 70 independent 1% fault
+opportunities in that model. It is not a general formula for algorithm fidelity.
 
----
+## 5. Preparation, readout, crosstalk, and leakage
 
-## 4. Connectivity Constraints and SWAP Routing
+Preparation errors and measurement errors are often grouped as SPAM, but
+calibration must specify which effects are included. Readout can be modeled
+by a classical assignment matrix with columns summing to one:
 
-In quantum algorithms (e.g. Quantum Fourier Transform, Quantum Phase Estimation), gates are often required between arbitrary pairs of qubits $(q_i, q_j)$. However, solid-state quantum processors have fixed, localized coupling graphs.
+$$
+M_{ij}=P(\text{recorded }i\mid\text{prepared }j),\qquad
+\mathbf p_{\rm observed}=M\mathbf p_{\rm true}.
+$$
 
-```text
-Linear Chain:       q₀ --- q₁ --- q₂ --- q₃
+An invertible, stationary, accurately calibrated M permits the linear estimate
+$\widehat{\mathbf p}_{\rm true}=M^{-1}\widehat{\mathbf p}_{\rm observed}$.
+Finite samples can produce negative estimates and an ill-conditioned inverse
+can amplify uncertainty. A constrained fit can impose physical probabilities;
+readout correction does not repair state-preparation or gate errors.
+For a practical treatment see [Bravyi et al. (2020)](https://arxiv.org/abs/2006.14044).
 
-Heavy-Hex (IBM):    q₀ --- q₁ --- q₂
-                           |
-                          q₃
-                           |
-                    q₄ --- q₅ --- q₆
+**Worked example:** with
+
+$$
+M=\begin{bmatrix}0.95&0.10\\0.05&0.90\end{bmatrix},\qquad
+\mathbf p_{\rm observed}=\begin{bmatrix}0.60\\0.40\end{bmatrix},
+$$
+
+$\det M=0.85$ and the linear estimate is
+$(0.50/0.85,0.35/0.85)^T\approx(0.58823529,0.41176471)^T$.
+This uses a known assignment matrix and does not itself account for calibration
+uncertainty or drift.
+
+The arithmetic of these examples is executable:
+
+```python
+import numpy as np
+
+# A selected independent stochastic model, not average gate fidelity.
+no_fault_probability = 0.999**50 * 0.985**20 * 0.98**4
+assert np.isclose(no_fault_probability, 0.64849006, atol=5e-9, rtol=0)
+
+# A chosen half-contrast target for a stationary exponential envelope.
+complete_layers = int(np.floor(-(100e-6 / 200e-9) * np.log(0.5)))
+assert complete_layers == 346
+
+# Solve rather than explicitly forming an inverse for numerical evaluation.
+assignment_matrix = np.array([[0.95, 0.10], [0.05, 0.90]])
+observed = np.array([0.60, 0.40])
+estimated = np.linalg.solve(assignment_matrix, observed)
+assert np.allclose(estimated, [10 / 17, 7 / 17], atol=1e-12, rtol=0)
+assert np.allclose(assignment_matrix @ estimated, observed, atol=1e-12, rtol=0)
 ```
 
-### The Cost of Non-Adjacent Gates
+Crosstalk makes an operation depend on neighboring activity. Leakage populates
+levels outside the designated qubit subspace; a two-level Pauli channel does
+not represent it. Leakage handling can be incorporated into an error-correction
+architecture, but requires mechanisms beyond simply assuming every fault is X,
+Y, or Z within the qubit space.
 
-If an algorithm requires a $\mathrm{CNOT}(q_0 \to q_2)$ on a linear chain where $q_0$ and $q_2$ are not directly connected:
+## 6. Connectivity and a specific SWAP-routing construction
 
-1. A $\mathrm{SWAP}$ gate must be inserted between $q_1$ and $q_2$ to bring the states adjacent.
-2. The $\mathrm{CNOT}$ is executed between $q_0$ and the new position.
-3. Another $\mathrm{SWAP}$ is executed to restore the original qubit layout.
-
-$$
-\mathrm{CNOT}(q_0 \to q_2) \implies \mathrm{SWAP}(q_1, q_2)\ \mathrm{CNOT}(q_0 \to q_1)\ \mathrm{SWAP}(q_1, q_2)
-$$
-
-Since each $\mathrm{SWAP}$ decomposes into three CNOTs:
-
-$$
-\mathrm{SWAP} = \mathrm{CNOT}_{0\to 1}\ \mathrm{CNOT}_{1\to 0}\ \mathrm{CNOT}_{0\to 1}
-$$
-
-A single non-adjacent $\mathrm{CNOT}$ across distance 2 requires:
+Consider a bidirectional linear chain, a CNOT between endpoints at graph
+distance k edges, and the requirement to restore the initial mapping.
+One valid construction moves the control along k-1 edges, applies the adjacent
+CNOT, and reverses those moves. If each SWAP is decomposed into three CNOTs:
 
 $$
-3 + 1 + 3 = 7\ \text{physical CNOT gates!}
+N_{\rm SWAP}=2(k-1),\qquad
+N_{\rm CNOT}=6(k-1)+1.
 $$
 
-### Impact on Algorithm Fidelity
+Distance 1 requires one CNOT; distance 2 requires seven; distance 3 requires
+13. For `q0-q1-q2-q3`, swap `q0,q1`, then `q1,q2`, apply `CX(q2,q3)`,
+and undo the swaps in reverse order. The logical operation is `CX(q0,q3)`
+and all original wire assignments are restored.
 
-If each physical CNOT has fidelity $F_{\mathrm{CNOT}} = 99\%$, the effective fidelity of that single non-adjacent two-qubit gate drops to:
+This is the cost of this construction, not a minimum over all compilers.
+Bridge circuits, native entangling gates, direction constraints, changed final
+layouts, or cancellations with neighboring operations can change it.
+[SABRE](https://arxiv.org/abs/1809.02573) is one approach to optimizing mappings.
 
-$$
-F_{\mathrm{effective}} = (0.99)^7 \approx 93.2\%
-$$
+Under the independent 1% CNOT-fault model, the seven-CNOT example has no-fault
+probability $0.99^7\approx0.93206535$. Calling this its effective gate fidelity
+would add an assumption that the calculation does not justify.
 
-This drastic overhead underscores why **hardware-aware circuit transpilation and routing** (e.g. SABRE heuristic routing in Qiskit) is a primary focus of quantum compiler research.
+## 7. NISQ, error correction, and conditional resource estimates
 
----
+[Preskill (2018)](https://arxiv.org/abs/1801.00862) introduced NISQ to discuss
+processors limited by noise before large-scale fault tolerance. It is a
+historical framing, not a fixed modern qubit-count interval. A small phase
+estimation circuit can also run without error correction; the challenge is
+reliably scaling deep computations.
 
-## 5. From NISQ to Fault-Tolerant Quantum Computing (FTQC)
-
-John Preskill coined the term **NISQ (Noisy Intermediate-Scale Quantum)** in 2018 to describe current quantum computers:
-
-- **50 to 1,000 physical qubits**
-- **No quantum error correction (QEC)**
-- Limited circuit depth ($\sim 20\text{--}100$ entangling layers)
-- Algorithms designed for this regime: **VQE** (Variational Quantum Eigensolver) and **QAOA** (Quantum Approximate Optimization Algorithm), which use shallow parameterised circuits and classical optimization loops.
-
-### The Threshold Theorem & Logical Qubits
-
-To execute deep algorithms like Shor's factoring or full-scale quantum chemistry simulations, we must transition to **Fault-Tolerant Quantum Computing (FTQC)**.
-
-- **The Quantum Threshold Theorem:**
-  If the physical error rate per gate $\epsilon$ falls below a rigorous threshold ($\epsilon < \epsilon_{\mathrm{th}} \approx 10^{-2}$ to $10^{-3}$ for surface codes), quantum error correction can suppress logical error rates exponentially with code distance $d$:
-
-$$
-P_{\mathrm{logical}} \propto \left( \frac{\epsilon}{\epsilon_{\mathrm{th}}} \right)^{\frac{d+1}{2}}
-$$
-
-- **Physical to Logical Qubit Overhead:**
-  Encoding a single fault-tolerant **logical qubit** in a surface code typically requires $100$ to $1,000$ physical data and ancilla qubits.
-- A full-scale Shor algorithm capable of factoring RSA-2048 keys requires $\approx 4,000$ logical qubits, translating to roughly **$1\text{--}4$ million physical qubits** with current error rates.
-
----
-
-## 6. Worked Study Problems
-
-### Problem 1 — Estimating Circuit Fidelity
-**Problem:**
-A quantum circuit contains 50 single-qubit gates and 20 two-qubit CNOT gates, followed by measurement on 4 qubits.
-Assume average gate error rates:
-- $\epsilon_{1Q} = 0.001$ ($99.9\%$ fidelity)
-- $\epsilon_{2Q} = 0.015$ ($98.5\%$ fidelity)
-- Measurement readout error $\epsilon_{\mathrm{SPAM}} = 0.02$ ($98\%$ fidelity per qubit)
-
-Estimate the overall circuit success probability $F_{\mathrm{circuit}}$.
-
-**Solution:**
-Assuming independent, uncorrelated errors:
+The threshold principle requires a specified noise model and fault-tolerant
+construction. Surface-code thresholds depend on syndrome circuits, decoder,
+noise bias, correlations, and leakage assumptions. A common subthreshold
+scaling model for odd code distance d is:
 
 $$
-F_{\mathrm{circuit}} \approx (1 - \epsilon_{1Q})^{50} \times (1 - \epsilon_{2Q})^{20} \times (1 - \epsilon_{\mathrm{SPAM}})^4
+p_L\approx A\left(\frac p{p_{\rm th}}\right)^{(d+1)/2}.
 $$
 
-$$
-(1 - 0.001)^{50} \approx e^{-0.05} \approx 0.9512
-$$
+This is a model-dependent approximation, not a universal theorem with fixed A
+or a universal numerical threshold. Code distance and target logical error rate
+must accompany an overhead estimate. Data and syndrome ancillas grow roughly
+as $O(d^2)$ per surface-code patch; routing space and state factories add costs.
+See [Fowler et al. (2012)](https://arxiv.org/abs/1208.0928).
 
-$$
-(1 - 0.015)^{20} \approx e^{-0.30} \approx 0.7386
-$$
+For RSA-2048 factoring, two dated proposals illustrate why a single physical
+qubit count is misleading:
 
-$$
-(1 - 0.02)^4 \approx 0.9224
-$$
+| Proposal | Conditional estimate | Source assumptions |
+| --- | --- | --- |
+| Gidney and Eker?, 2019 preprint | About 20 million physical qubits and eight hours | Nearest-neighbor grid, physical gate error 0.1%, 1 microsecond code cycles, 10 microsecond reaction time |
+| Gidney, 2025 preprint | Fewer than one million noisy qubits and less than one week | The same stated timing/error assumptions, with different arithmetic, storage, and state-factory choices |
 
-Multiplying the components:
+These are algorithm-and-architecture resource estimates, not demonstrations
+or claims about available processors. The primary sources are
+[Gidney and Eker?](https://arxiv.org/abs/1905.09749) and
+[Gidney](https://arxiv.org/abs/2505.15917); their differing runtimes also matter.
 
-$$
-F_{\mathrm{circuit}} \approx 0.9512 \times 0.7386 \times 0.9224 \approx 0.6480 \quad (64.8\%)
-$$
+## Next steps
 
-Notice that the two-qubit gate errors account for the overwhelming majority of the fidelity loss ($26.1\%$ drop).
-
----
-
-### Problem 2 — Readout Confusion Inversion
-**Problem:**
-A single qubit is measured 10,000 times. The raw counts are 6,000 zeros and 4,000 ones ($\vec{P}_{\mathrm{meas}} = [0.60, 0.40]^T$).
-A calibration experiment reveals the confusion matrix:
-
-$$
-M = \begin{bmatrix} P(0|0) & P(0|1) \\ P(1|0) & P(1|1) \end{bmatrix} = \begin{bmatrix} 0.95 & 0.10 \\ 0.05 & 0.90 \end{bmatrix}
-$$
-
-Calculate the error-mitigated probabilities $\vec{P}_{\mathrm{ideal}}$.
-
-**Solution:**
-Compute the determinant of $M$:
-
-$$
-\det(M) = (0.95)(0.90) - (0.10)(0.05) = 0.855 - 0.005 = 0.850
-$$
-
-The inverse matrix $M^{-1}$ is:
-
-$$
-M^{-1} = \frac{1}{0.850} \begin{bmatrix} 0.90 & -0.10 \\ -0.05 & 0.95 \end{bmatrix}
-$$
-
-Multiply $M^{-1}$ by $\vec{P}_{\mathrm{meas}}$:
-
-$$
-\vec{P}_{\mathrm{ideal}} = \frac{1}{0.850} \begin{bmatrix} (0.90)(0.60) - (0.10)(0.40) \\ (-0.05)(0.60) + (0.95)(0.40) \end{bmatrix} = \frac{1}{0.850} \begin{bmatrix} 0.54 - 0.04 \\ -0.03 + 0.38 \end{bmatrix} = \frac{1}{0.850} \begin{bmatrix} 0.50 \\ 0.35 \end{bmatrix}
-$$
-
-$$
-P_{\mathrm{ideal}}(0) = \frac{0.50}{0.85} \approx 0.5882, \quad P_{\mathrm{ideal}}(1) = \frac{0.35}{0.85} \approx 0.4118
-$$
-
-Readout mitigation adjusted the ground state probability from $60.0\%$ to $58.8\%$, correcting for asymmetric readout bias.
-
----
-
-### Problem 3 — Routing Overhead on a Line Architecture
-**Problem:**
-Four qubits $q_0, q_1, q_2, q_3$ are arranged in a linear topology: $q_0 - q_1 - q_2 - q_3$.
-An algorithm requires a two-qubit gate between $q_0$ and $q_3$.
-How many additional SWAP gates and equivalent CNOT gates are required to execute this operation and restore the initial layout?
-
-**Solution:**
-To make $q_0$ and $q_3$ adjacent:
-1. SWAP $q_0$ with $q_1$: register is $[q_1, q_0, q_2, q_3]$ (1 SWAP)
-2. SWAP $q_0$ with $q_2$: register is $[q_1, q_2, q_0, q_3]$ (1 SWAP)
-$q_0$ and $q_3$ are now adjacent! Execute the target two-qubit gate (1 CNOT).
-3. Reverse routing: SWAP $q_0$ with $q_2$, then SWAP $q_0$ with $q_1$ (2 SWAPs).
-
-Total overhead:
-- Total SWAP gates required: $2 + 2 = 4\ \text{SWAP}$ gates.
-- Since each SWAP contains 3 CNOTs: $4 \times 3 = 12\ \text{additional CNOT gates}$.
-- Total two-qubit gates executed: $12 + 1 = 13\ \text{CNOTs}$.
-- Distance $k = 3$ on a line imposes a $13\times$ two-qubit cost multiplier ($4(k-1) + 1$).
-
----
-
-## 7. Next Steps
-
-- [Noise & Quantum Channels](../07-noise-and-channels/README.md) — explore mathematical descriptions of $T_1$ and $T_2$ noise
-- [Ideal vs Noisy Execution](../07-noise-and-channels/ideal-vs-noisy.md) — see how circuit depth degrades simulated algorithm outputs
-- [Quantum Algorithms](../10-quantum-algorithms/README.md) — discover how algorithm design adapts to hardware reality
+- [Noise channels](../07-noise-and-channels/README.md): channel definitions and T1/T2 assumptions.
+- [Fidelity and trace distance](../07-noise-and-channels/FIDELITY.md): state metrics and their conventions.
+- [Bell-pair noise study](../07-noise-and-channels/bell-noise-study.md): a validated local-noise model.
+- [Scientific scope](../reference/scientific-scope.md): source and approximation conventions.

@@ -10,6 +10,11 @@ $$
 
 with unknown phase $\theta \in [0, 1)$, the goal of **quantum phase estimation (QPE)** is to estimate $\theta$ to $m$ bits of precision.
 
+The eigenstate is assumed to be available and controlled powers of U must be
+implementable. An early primary source for phase estimation is
+[Kitaev (1995)](https://arxiv.org/abs/quant-ph/9511026). This page describes the
+Fourier-register construction and makes its precision and bit order explicit.
+
 ## Why it matters
 
 Phase estimation is one of the most fundamental subroutines in quantum algorithms:
@@ -32,6 +37,11 @@ $$
 $$
 
 ### Step 2: Controlled-$U^{2^j}$ operations (Phase kickback)
+
+Here wire j controls power $2^j$, so its numerical weight is $2^j$.
+The integer label k in the equations means the bits `q[m-1]...q[0]`, not
+the repository's usual tensor label `q[0]...q[m-1]`. The two descriptions
+refer to the same physical wires and are related by bit reversal.
 For each counting qubit $j \in \{0, 1, \dots, m-1\}$, apply a controlled unitary $C\text{-}U^{2^j}$ targeted at $|\psi\rangle$.
 Since $U^{2^j}|\psi\rangle = e^{2\pi i 2^j \theta}|\psi\rangle$, phase kickback imparts the phase into the counting register:
 
@@ -39,21 +49,37 @@ $$
 |\psi_2\rangle = \frac{1}{\sqrt{2^m}} \sum_{k=0}^{2^m-1} e^{2\pi i \theta k} |k\rangle |\psi\rangle.
 $$
 
-Notice that the state of the counting register is now precisely the output of the Quantum Fourier Transform applied to the value $2^m \theta$:
+Let $M=2^m$. If $b=M\theta$ is an integer, the counting state equals the
+Fourier transform of the valid basis label b:
 
 $$
-|\psi_{\text{counting}}\rangle = \operatorname{QFT}|2^m \theta\rangle.
+|\psi_{\text{counting}}\rangle = \operatorname{QFT}_M|b\rangle,
+\qquad b=M\theta\in\{0,\ldots,M-1\}.
 $$
+
+For noninteger $M\theta$, there is no computational-basis ket with that
+fractional label. The phase-weighted sum above remains the correct state.
 
 ### Step 3: Inverse Quantum Fourier Transform ($\text{QFT}^\dagger$)
-Applying $\text{QFT}^\dagger$ to the counting register converts the relative phases back into computational basis states:
+For an exact integer label $b=M\theta$, the inverse transform recovers that
+basis state:
 
 $$
-\operatorname{QFT}^\dagger |\psi_{\text{counting}}\rangle = |2^m \theta\rangle.
+\operatorname{QFT}_M^\dagger |\psi_{\text{counting}}\rangle = |b\rangle,
+\qquad b=M\theta\in\mathbb Z.
 $$
+
+Otherwise the output is a superposition with the amplitudes given below,
+not a basis state labeled by a fractional number.
 
 ### Step 4: Measurement
-Measuring the $m$ counting qubits in the computational basis yields a bit string representing $2^m \theta$:
+Measuring gives an integer y and the numerical estimate $\widehat\theta=y/M$.
+For a general eigenphase its probability is:
+
+$$
+P(y)=\left|\frac1M\sum_{k=0}^{M-1}
+e^{2\pi i k(\theta-y/M)}\right|^2.
+$$
 
 - **Exact case:** If $\theta$ can be expressed exactly as an $m$-bit binary fraction:
 
@@ -62,7 +88,18 @@ $$
 $$
 
     the measurement returns the exact integer $2^m \theta$ with probability $1$.
-- **Approximate case:** If $\theta$ cannot be represented exactly in $m$ bits, the measurement distribution peaks sharply at the closest $m$-bit approximations, yielding the nearest binary fraction with probability at least $4/\pi^2 \approx 0.405$. Adding $t = O(\log(1/\epsilon))$ extra ancilla qubits boosts the success probability to $1 - \epsilon$.
+- **Approximate case:** A nearest grid point, with phase distance understood
+  modulo one, has probability at least $4/\pi^2\approx0.405$. A single outcome
+  is not guaranteed to be nearest. Extra precision qubits can reduce the
+  probability of errors larger than a chosen phase tolerance; the precision
+  and failure-probability targets must be specified separately.
+
+The precision is not free. If controlled powers are implemented by repeatedly
+calling controlled U, the total number of such calls is
+$1+2+\cdots+2^{m-1}=2^m-1$. Special unitaries can admit cheaper power
+implementations, but merely counting m wires does not establish computational
+cost or quantum advantage. If the target is a superposition of eigenstates,
+the outcomes are a mixture of the corresponding phase distributions.
 
 ## Repository example
 
@@ -83,7 +120,12 @@ $$
   - $j=1$: Controlled-$T^{2^1} = C\text{-}S = C\text{-}P(\pi/2)$
   - $j=2$: Controlled-$T^{2^2} = C\text{-}Z = C\text{-}P(\pi)$
 
-After $\text{QFT}^\dagger$, measuring the counting register returns the state `001` (value 1) deterministically:
+After the inverse transform, the **numerical phase label** is `001` (value 1)
+deterministically. The increasing wire-order label is `100`: wire 0 is one.
+NumPy's analytical result and Qiskit's default count display use `001`,
+whereas PennyLane's wire-order probability array has its peak at index 4
+and Q# returns `[One, Zero, Zero]`. See the
+[bit-ordering reference](../reference/bit-ordering.md).
 
 $$
 \theta = \frac{1}{2^3} = \frac{1}{8} = 0.125.

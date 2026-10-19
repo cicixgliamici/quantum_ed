@@ -4,6 +4,7 @@ import sys
 
 from qiskit import QuantumCircuit
 from qiskit.primitives import StatevectorSampler
+from quantum_ed.states import ket1, normalize
 
 
 def configure_console() -> None:
@@ -13,12 +14,15 @@ def configure_console() -> None:
         sys.stdout.reconfigure(encoding="utf-8")
 
 
-def build_circuit() -> QuantumCircuit:
-    """Build a coherent teleportation circuit for the input state |1>."""
+def build_circuit(input_state=None) -> QuantumCircuit:
+    """Teleport a column vector, normalizing it explicitly; default is |1>."""
+    message = normalize(ket1() if input_state is None else input_state)
+    if message.shape != (2, 1):
+        raise ValueError("input_state must have shape (2, 1)")
     circuit = QuantumCircuit(3, 1)
 
     # Qubit 0 is the message; qubits 1 and 2 are Alice and Bob's Bell pair.
-    circuit.x(0)
+    circuit.prepare_state(message.ravel(), 0)
     circuit.h(1)
     circuit.cx(1, 2)
     circuit.barrier()

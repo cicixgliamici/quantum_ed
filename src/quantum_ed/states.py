@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 import numpy as np
-from .linalg import dagger
+from ._validation import real_scalar, state_vector, tolerance
 
 StateVector = np.ndarray
 
@@ -52,11 +52,23 @@ def bell_psi_minus() -> StateVector:
     return (1 / np.sqrt(2)) * np.array([[0], [1], [-1], [0]], dtype=complex)
 
 def normalize(ket: np.ndarray, atol: float = 1e-12) -> np.ndarray:
-    """Normalize a ket; raise if norm is ~0."""
-    nrm = np.sqrt((dagger(ket) @ ket).item())
-    if abs(nrm) < atol:
+    """Normalize a finite qubit column vector; reject norms <= atol.
+
+    This is an explicit rescaling operation, not a physical state evolution.
+    """
+    ket = state_vector(ket)
+    atol = tolerance(atol)
+    # Convert integers before abs: the smallest signed integer cannot be negated.
+    ket = ket.astype(complex)
+    # Scaling first avoids overflow/underflow when squaring finite amplitudes.
+    scale = float(np.max(np.maximum(np.abs(ket.real), np.abs(ket.imag))))
+    if scale == 0:
         raise ValueError("Cannot normalize a near-zero vector.")
-    return ket / nrm
+    scaled = ket / scale
+    scaled_norm = float(np.linalg.norm(scaled))
+    if scale <= atol / scaled_norm:
+        raise ValueError("Cannot normalize a near-zero vector.")
+    return scaled / scaled_norm
 
 def bloch_vector(ket: np.ndarray) -> np.ndarray:
     """Return the Bloch vector r for a *pure* qubit state |psi>.
@@ -67,7 +79,8 @@ def bloch_vector(ket: np.ndarray) -> np.ndarray:
 
     Returns: np.array([rx, ry, rz]) as floats.
     """
-    ket = normalize(ket)
+    # Bloch coordinates describe one qubit; normalization is intentional here.
+    ket = normalize(state_vector(ket, dimension=2))
     a = ket[0,0]
     b = ket[1,0]
     # Standard formula
@@ -81,6 +94,8 @@ def state_from_bloch(theta: float, phi: float) -> np.ndarray:
 
     |psi> = cos(theta/2)|0> + e^{i phi} sin(theta/2)|1>
     """
+    theta = real_scalar(theta, "theta")
+    phi = real_scalar(phi, "phi")
     a = np.cos(theta/2.0)
     b = np.exp(1j*phi) * np.sin(theta/2.0)
     return normalize(np.array([[a],[b]], dtype=complex))

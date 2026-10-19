@@ -1,5 +1,3 @@
-numpy
-scipy
-matplotlib
-jupyterlab
-pytest
+# Convenience pip installation; the reproducible environment is defined by uv.lock.
+# Keep dependency declarations in pyproject.toml instead of duplicating them here.
+-e .[dev]

@@ -174,7 +174,9 @@ $$
 S_{\mathrm{quantum}} = \frac{1}{\sqrt{2}} + \frac{1}{\sqrt{2}} + \frac{1}{\sqrt{2}} - \left( -\frac{1}{\sqrt{2}} \right) = \frac{4}{\sqrt{2}} = 2\sqrt{2} \approx 2.8284
 $$
 
-Because $2\sqrt{2} > 2$, **quantum mechanics strictly violates the CHSH inequality**.
+Because $2\sqrt2>2$, this particular state and these measurement settings
+violate the CHSH bound. This does not mean every quantum state, or every
+entangled mixed state, violates CHSH for arbitrary settings.
 
 ---
 

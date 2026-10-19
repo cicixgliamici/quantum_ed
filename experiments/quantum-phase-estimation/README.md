@@ -9,6 +9,12 @@ This experiment implements a 4-qubit instance:
 - **Counting qubits (qubits 0, 1, 2):** $m = 3$ qubits providing exact representation $2^3 \times (1/8) = 1$.
 - **Expected measurement on counting register:** `001` with probability $1.0$.
 
+Here `001` denotes numerical phase bits, as displayed by Qiskit and returned
+by the NumPy analytical inverse DFT. In increasing wire order `q0 q1 q2`,
+the result is `100`: wire 0 has binary weight one in this circuit. PennyLane
+therefore places probability one at array index 4, and Q# returns
+`[One, Zero, Zero]`. The shared validator converts these conventions explicitly.
+
 Implementations: [NumPy](numpy/quantum_phase_estimation.py),
 [Qiskit](qiskit/quantum_phase_estimation.py), [Q#](qsharp/QuantumPhaseEstimation.qs),
 [OpenQASM 3](openqasm/quantum_phase_estimation.qasm), and
