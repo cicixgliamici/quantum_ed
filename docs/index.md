@@ -4,9 +4,43 @@ Quantum-Ed connects mathematical quantum computing to executable simulations
 in NumPy, Qiskit, PennyLane, Q#, and OpenQASM 3. The code and notes make the
 assumptions and expected results inspectable.
 
-For a technical evaluation, start with the
-[ten-minute reviewer guide](reviewer-guide.md). For a complete investigation,
-read the [Bell-pair noise study](07-noise-and-channels/bell-noise-study.md).
+[Review the project](reviewer-guide.md){ .md-button .md-button--primary }
+[Start learning](00-intro/README.md){ .md-button }
+
+## Choose your route
+
+<div class="grid cards" markdown>
+
+- **Evaluate the evidence**
+
+    Follow a ten-minute route through the mathematical claims, implementation,
+    validation protocol, and limits of the project.
+
+    [Open the reviewer guide](reviewer-guide.md)
+
+- **Learn the foundations**
+
+    Build from linear algebra to qubits, measurement, entanglement, and noise.
+    Each chapter connects mathematical notation to a computational model.
+
+    [Begin with the introduction](00-intro/README.md)
+
+- **Compare implementations**
+
+    Inspect nine experiments across NumPy, Qiskit, PennyLane, Q#, and OpenQASM 3,
+    with explicit expected results and conventions.
+
+    [Explore the experiments](experiments.md)
+
+- **Work through the code**
+
+    Use seven ordered notebooks for exploration and three exercises for
+    practice. Run the programs locally using the documented environment.
+
+    [Read the executed notebooks](notebooks.md)
+    · [Try the exercises](exercises.md)
+
+</div>
 
 ## A question with reproducible evidence
 
@@ -16,6 +50,11 @@ independent NumPy and PennyLane models. Its figures, CSV data, and validation
 summary connect each conclusion to a computation.
 
 ![Bell-pair fidelity, entanglement, and purity under local noise](assets/bell-noise/metrics.png)
+
+[Read the study](07-noise-and-channels/bell-noise-study.md){ .md-button }
+
+Inspect the [CSV measurements](assets/bell-noise/results.csv) and
+[validation summary](assets/bell-noise/summary.json) alongside the derivations.
 
 ## Start here
 

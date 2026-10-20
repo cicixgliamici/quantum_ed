@@ -18,3 +18,5 @@ For a short evaluation route through the evidence, use the
   matrix, installed-package checks, profiles, and environment reports.
 - [Useful matrices](../09-useful-matrices/README.md) collects the matrices used
   throughout the repository.
+- [Website publishing](website-publishing.md) explains GitHub Pages setup,
+  local previews, and deployment troubleshooting.

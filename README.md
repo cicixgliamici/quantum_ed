@@ -87,6 +87,14 @@ comparison was performed.
 
 ## Read or build the documentation
 
+The documentation is configured for
+[GitHub Pages](https://cicixgliamici.github.io/quantum_ed/).
+It includes browser-readable notebook lessons with freshly executed outputs
+and figures, generated automatically during the documentation build.
+The [publishing guide](docs/reference/website-publishing.md) explains the
+one-time Pages setup and automatic deployment from `main`. The public URL
+becomes available after the first successful deployment.
+
 Follow the [reviewer route](docs/reviewer-guide.md) for a short technical review,
 or start with [linear algebra](docs/01-linear-algebra/README.md) and proceed
 through states, measurement, entanglement, circuits, mixed states, and noise.

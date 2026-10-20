@@ -1,15 +1,42 @@
 site_name: Quantum-Ed
 site_description: Quantum theory connected to executable programming ecosystems
+site_url: https://cicixgliamici.github.io/quantum_ed/
 repo_name: quantum-ed
 repo_url: https://github.com/cicixgliamici/quantum_ed
 docs_dir: docs
+hooks:
+  - tools/notebook_docs.py
 
 theme:
   name: material
+  language: en
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: teal
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: teal
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
   features:
     - navigation.sections
+    - navigation.indexes
+    - navigation.footer
     - navigation.top
     - content.code.copy
+    - search.highlight
+    - search.suggest
+
+# Declare search explicitly so future plugins cannot silently remove it.
+plugins:
+  - search
 
 markdown_extensions:
   - attr_list
@@ -53,6 +80,7 @@ nav:
   - Hardware: 08-hardware/README.md
   - Experiments: experiments.md
   - Exercises: exercises.md
+  - Notebooks: notebooks.md
   - Reference:
       - Index: reference/README.md
       - Useful matrices: 09-useful-matrices/README.md
@@ -61,3 +89,4 @@ nav:
       - Experiment validation: reference/experiment-validation.md
       - Scientific scope: reference/scientific-scope.md
       - Reproducible environments: reference/reproducibility.md
+      - Website publishing: reference/website-publishing.md

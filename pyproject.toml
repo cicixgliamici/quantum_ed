@@ -15,7 +15,8 @@ dependencies = ["numpy", "scipy", "matplotlib"]
 test = ["pytest>=8"]
 dev = ["pytest>=8", "jupyterlab", "ipykernel"]
 notebooks = ["nbconvert>=7", "ipykernel"]
-docs = ["mkdocs-material>=9"]
+# Website builds execute notebooks so published results match the checked-out code.
+docs = ["mkdocs-material>=9", "nbconvert>=7", "ipykernel"]
 # Qiskit is optional so the NumPy-first core remains lightweight.
 showcase = ["qiskit>=2.0"]
 openqasm = ["qiskit[qasm3-import]>=2.0"]

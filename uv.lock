@@ -2499,7 +2499,9 @@ dev = [
     { name = "pytest" },
 ]
 docs = [
+    { name = "ipykernel" },
     { name = "mkdocs-material" },
+    { name = "nbconvert" },
 ]
 notebooks = [
     { name = "ipykernel" },
@@ -2524,10 +2526,12 @@ test = [
 [package.metadata]
 requires-dist = [
     { name = "ipykernel", marker = "extra == 'dev'" },
+    { name = "ipykernel", marker = "extra == 'docs'" },
     { name = "ipykernel", marker = "extra == 'notebooks'" },
     { name = "jupyterlab", marker = "extra == 'dev'" },
     { name = "matplotlib" },
     { name = "mkdocs-material", marker = "extra == 'docs'", specifier = ">=9" },
+    { name = "nbconvert", marker = "extra == 'docs'", specifier = ">=7" },
     { name = "nbconvert", marker = "extra == 'notebooks'", specifier = ">=7" },
     { name = "numpy" },
     { name = "pennylane", marker = "extra == 'pennylane'", specifier = ">=0.45,<0.46" },

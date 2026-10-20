@@ -190,11 +190,13 @@ jobs:
           version-file: pyproject.toml
           enable-cache: true
           cache-suffix: documentation
-      - run: uv sync --locked --extra docs --no-editable
+      - run: uv sync --locked --extra docs --extra test --no-editable
       - run: uv pip check --python .venv
       - run: uv run --no-sync python -I tools/environment_report.py --require-wheel
       - name: Build the documentation site
         run: uv run --no-sync python -m mkdocs build --strict
+      - name: Check notebook export and failure handling
+        run: uv run --no-sync python -m pytest -q tests/test_notebook_docs.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
