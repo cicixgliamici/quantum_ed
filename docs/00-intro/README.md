@@ -1,5 +1,15 @@
 # Introduction
 
+## Learning guide
+
+- **Prerequisites:** basic Python, vectors, and complex numbers; the next chapter reviews the required algebra.
+- **Goals:** identify the repository layers and use its state, tensor-order, and numerical conventions.
+- **Runnable companion:** run the [first NumPy demo](https://github.com/cicixgliamici/quantum_ed/blob/main/demos/README.md) and the setup lesson in [executed notebooks](../notebooks.md).
+- **Practice:** prepare a Bell pair and predict which amplitudes the demo should print before running it.
+- **References:** [learning path](../learning-path.md), [input contracts](../reference/input-contracts.md), and [bit ordering](../reference/bit-ordering.md).
+
+## Overview
+
 Welcome to **Quantum-Ed**, an educational platform designed to build a deep, rigorous, and practical understanding of quantum computing and quantum information.
 
 ---
@@ -33,6 +43,7 @@ The repository is structured into progressive conceptual layers:
 08-hardware/         --> Physical modalities (superconducting, trapped ions, photonics), noise budgets
 09-useful-matrices/  --> Reference catalog of standard matrices, gates, and projectors
 10-quantum-algorithms/-> Deutsch-Jozsa, Bernstein-Vazirani, Grover, QFT, QPE, VQE
+11-quantum-networks/  --> Quantum communication, entanglement swapping, and repeater assumptions
 ```
 
 ---

@@ -8,6 +8,7 @@ that path easy to inspect.
 
 - Put reusable NumPy-first teaching code in `src/quantum_ed/`.
 - Put theory and derivations in `docs/`.
+- Put SDK-specific tutorials in `examples/` and short NumPy demos in `demos/`.
 - Put interactive lessons in `notebooks/`.
 - Put comparable, concept-specific programs in `experiments/<concept>/`.
 - Put property-driven learning tasks in `exercises/`.
@@ -25,6 +26,18 @@ Document the goal, quantum pattern, expected result, bit-ordering convention,
 implementation links, and run commands. The manifest must conform to
 `experiments/schema.json` and declare one source for every supported ecosystem.
 Add ecosystems only when they implement the same logical experiment.
+
+After changing a manifest, refresh the repository and website catalogs with
+`python tools/experiment_catalog.py --write`. The repository checker rejects
+stale catalogs. See the [tool index](tools/README.md) for maintenance commands.
+
+## Chapter structure
+
+Begin each main chapter with a **Learning guide** stating prerequisites,
+learning goals, a runnable companion, a practice task, and related references.
+Keep the derivations and worked examples in the chapter body. Use real links
+to existing code and exercises; distinguish suggested practice from automated
+checks. Explain design choices in [the project rationale](docs/project-design.md).
 
 ## Code expectations
 
@@ -65,3 +78,8 @@ installation. For a noneditable recheck after changing source, add
 `--reinstall-package quantum-ed` to synchronization. Dependency updates must
 include the lockfile and should follow the
 [environment reproduction guide](docs/reference/reproducibility.md).
+
+After moving or removing modules, clean the generated `build/lib/` directory
+before rebuilding the wheel. Setuptools can retain files from earlier builds;
+`tools/environment_report.py --require-wheel` rejects tutorial modules that
+accidentally survive in a wheel.

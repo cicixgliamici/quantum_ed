@@ -68,6 +68,12 @@ the local checkout.
 
 ## Reproduce independently
 
+For a network-protocol example, inspect
+[entanglement swapping](11-quantum-networks/entanglement-swapping.md).
+The four-branch derivation is checked in all five ecosystems, including phase
+corrections and branch probabilities. The corresponding notebook contrasts
+the conditional Bell states with the ensemble obtained without Bob's record.
+
 Run commands from the repository root using Python 3.11 or newer. A virtual
 environment is recommended. Start with the lightweight core:
 
@@ -98,7 +104,8 @@ agreement can be assessed explicitly, rather than requiring identical image
 bytes across different library versions.
 
 For notebook exploration, follow the
-[ordered notebook index](https://github.com/cicixgliamici/quantum_ed/blob/main/notebooks/README.md).
+[executed notebook lessons](notebooks.md). The [project design](project-design.md)
+explains the contribution, tradeoffs, and conventions behind the implementation.
 The [quality workflow](https://github.com/cicixgliamici/quantum_ed/blob/main/.github/workflows/quality.yml)
 specifies core tests, separate SDK jobs, study reproduction, notebook execution,
 and strict documentation builds. CI artifacts retain the generated study data

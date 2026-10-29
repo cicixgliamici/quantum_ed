@@ -147,38 +147,8 @@ jobs:
           name: qsharp-py${{ matrix.python }}
           path: build/reproducibility/
 
-  notebooks:
-    name: Reproducible notebooks
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version-file: .python-version
-      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
-        with:
-          version-file: pyproject.toml
-          enable-cache: true
-          cache-suffix: notebooks
-      - run: uv sync --locked --extra notebooks --no-editable
-      - run: uv pip check --python .venv
-      - run: uv run --no-sync python -I tools/environment_report.py --require-wheel
-      - name: Execute clean notebook copies
-        run: |
-          mkdir -p build/executed-notebooks
-          uv run --no-sync python -m jupyter nbconvert --to notebook --execute notebooks/*.ipynb \
-            --output-dir build/executed-notebooks \
-            --ExecutePreprocessor.timeout=120
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: notebook-reproduction
-          path: |
-            build/reproducibility/
-            build/executed-notebooks/
-
   documentation:
-    name: Documentation site
+    name: Documentation and notebook reproduction
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -193,15 +163,17 @@ jobs:
       - run: uv sync --locked --extra docs --extra test --no-editable
       - run: uv pip check --python .venv
       - run: uv run --no-sync python -I tools/environment_report.py --require-wheel
-      - name: Build the documentation site
+      - name: Execute notebook copies and build the documentation site
         run: uv run --no-sync python -m mkdocs build --strict
       - name: Check notebook export and failure handling
         run: uv run --no-sync python -m pytest -q tests/test_notebook_docs.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: documentation-environment
-          path: build/reproducibility/
+          name: documentation-reproduction
+          path: |
+            build/reproducibility/
+            build/executed-notebooks/
 
   pennylane:
     name: PennyLane / Python ${{ matrix.python }}

@@ -12,6 +12,7 @@ installed `quantum_ed` package rather than copying its implementation logic.
 | `04-chsh.ipynb` | Bell-state correlations violate the classical CHSH bound |
 | `05-quantum-teleportation.ipynb` | Alice's Bell-basis measurement and Bob's feedforward correction recover arbitrary states with unit fidelity |
 | `06-grover-search.ipynb` | One Grover iteration finds the marked state deterministically in the two-qubit example |
+| `07-entanglement-swapping.ipynb` | Four Bell-measurement branches become one corrected endpoint Bell state; the unrecorded ensemble is maximally mixed |
 
 Versioned notebooks have empty outputs to keep reviews small and deterministic.
 CI executes copies of every notebook and fails on the first cell error.

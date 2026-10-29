@@ -50,7 +50,9 @@ extra_javascript:
 
 nav:
   - Home: index.md
+  - Learning path: learning-path.md
   - Reviewer guide: reviewer-guide.md
+  - Project design: project-design.md
   - Foundations:
       - Introduction: 00-intro/README.md
       - Linear algebra: 01-linear-algebra/README.md
@@ -78,6 +80,10 @@ nav:
       - Variational quantum eigensolver: 10-quantum-algorithms/variational-quantum-eigensolver.md
       - Ecosystem comparison: 10-quantum-algorithms/language-comparison.md
   - Hardware: 08-hardware/README.md
+  - Quantum networks:
+      - Overview: 11-quantum-networks/README.md
+      - Entanglement swapping: 11-quantum-networks/entanglement-swapping.md
+      - Repeaters and link budgets: 11-quantum-networks/repeaters-and-link-budgets.md
   - Experiments: experiments.md
   - Exercises: exercises.md
   - Notebooks: notebooks.md

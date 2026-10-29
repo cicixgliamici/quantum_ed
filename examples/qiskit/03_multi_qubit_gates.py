@@ -21,6 +21,7 @@ In particular, controlled gates are fundamental for:
     - quantum error correction
 
 This file also reinforces the concept of control and target qubits.
+Two-qubit displayed kets use Qiskit's order |q1 q0>, with q0 on the right.
 """
 
 from qiskit import QuantumCircuit
@@ -90,7 +91,7 @@ def example_cnot_control_one() -> None:
 
     Apply X to q0:
 
-        |10>
+        |01>
 
     Then:
 
@@ -98,7 +99,7 @@ def example_cnot_control_one() -> None:
 
     Since control q0 = 1, q1 is flipped:
 
-        |10> -> |11>
+        |01> -> |11>
     """
 
     circuit = QuantumCircuit(2)
@@ -123,7 +124,7 @@ def example_cnot_superposition() -> None:
 
     Apply H to q0:
 
-        (|00> + |10>) / sqrt(2)
+        (|00> + |01>) / sqrt(2)
 
     Apply CX:
 
@@ -202,7 +203,7 @@ def example_swap() -> None:
 
     Start from:
 
-        |10>
+        |01>
 
     Then:
 
@@ -210,7 +211,7 @@ def example_swap() -> None:
 
     produces:
 
-        |01>
+        |10>
 
     Note
     ----

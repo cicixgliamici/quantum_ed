@@ -20,7 +20,9 @@ The two-qubit register starts in:
 
 After applying H to qubit 0:
 
-    (|00> + |10>) / sqrt(2)
+    (|00> + |01>) / sqrt(2)
+
+Displayed kets use Qiskit's order |q1 q0>.
 
 After applying CX(0, 1):
 
@@ -57,14 +59,14 @@ def prepare_bell_circuit() -> QuantumCircuit:
     #
     # H on q0 creates:
     #
-    #     (|00> + |10>) / sqrt(2)
+    #     (|00> + |01>) / sqrt(2)
     #
     circuit.h(0)
 
     # Controlled-X entangles the two qubits:
     #
     #     |00> -> |00>
-    #     |10> -> |11>
+    #     |01> -> |11>
     #
     # Final state:
     #

@@ -28,6 +28,8 @@ package-dir = {"" = "src"}
 
 [tool.setuptools.packages.find]
 where = ["src"]
+# Only the teaching library belongs in a wheel; tutorials are repository assets.
+include = ["quantum_ed*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

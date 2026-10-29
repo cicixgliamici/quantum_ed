@@ -1,5 +1,15 @@
 # Quantum Entanglement
 
+## Learning guide
+
+- **Prerequisites:** [measurement](../03-measurement/README.md) and tensor products from [linear algebra](../01-linear-algebra/README.md).
+- **Goals:** distinguish product states from entangled states and relate Bell correlations to reduced density matrices.
+- **Runnable companion:** run the [Bell reduced-state demo](https://github.com/cicixgliamici/quantum_ed/blob/main/demos/README.md) and inspect the Bell lesson in [executed notebooks](../notebooks.md).
+- **Practice:** attempt [Prepare a Bell state](https://github.com/cicixgliamici/quantum_ed/blob/main/exercises/02-prepare-bell-state/README.md) and predict its one-qubit reductions.
+- **References:** [CHSH](CHSH.md), [teleportation](quantum-teleportation.md), and [density matrices](../06-density-matrices/README.md).
+
+## Overview
+
 When two quantum systems interact, their state space is formed by the tensor product:
 
 $$

@@ -1,5 +1,15 @@
 # Measurement in Quantum Mechanics
 
+## Learning guide
+
+- **Prerequisites:** [qubits and states](../02-qubits-and-states/README.md), inner products, and projectors.
+- **Goals:** calculate Born probabilities, post-measurement states, and expectation values in different bases.
+- **Runnable companion:** use the Python example below and the [measurement utilities](https://github.com/cicixgliamici/quantum_ed/blob/main/src/quantum_ed/measurement.py).
+- **Practice:** calculate the outcomes for a plus state in the Z and X bases before running the examples.
+- **References:** [bit ordering](../reference/bit-ordering.md) and [input contracts](../reference/input-contracts.md).
+
+## Overview
+
 In classical physics, observing a system is passive: you can measure the position or speed of a ball with arbitrary precision without disturbing its trajectory.
 
 In quantum mechanics, **measurement is active, probabilistic, and fundamentally irreversible**. Measuring a quantum state disturbs it, collapsing a continuous superposition of amplitudes into a single discrete basis state.

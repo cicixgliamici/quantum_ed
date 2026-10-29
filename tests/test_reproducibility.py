@@ -4,10 +4,30 @@ import hashlib
 import json
 from pathlib import Path
 import tomllib
+from importlib.metadata import PackagePath
+from types import SimpleNamespace
 
 import pytest
 
 from tools import environment_report
+
+
+def test_wheel_rejects_tutorials_from_an_old_build_directory():
+    distribution = SimpleNamespace(files=[
+        PackagePath("quantum_ed/states.py"),
+        PackagePath("showcase/qiskit/00_first_circuit.py"),
+    ])
+    with pytest.raises(ValueError, match="Clean build/lib"):
+        environment_report.validate_wheel_contents(distribution)
+
+
+def test_wheel_accepts_library_modules_and_distribution_metadata():
+    distribution = SimpleNamespace(files=[
+        PackagePath("quantum_ed/__init__.py"),
+        PackagePath("quantum_ed/viz/bloch.py"),
+        PackagePath("quantum_ed-0.1.0.dist-info/METADATA"),
+    ])
+    environment_report.validate_wheel_contents(distribution)
 
 
 def test_bootstrap_resolver_matches_the_project_requirement():

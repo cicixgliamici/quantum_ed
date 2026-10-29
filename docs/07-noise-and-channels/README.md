@@ -1,5 +1,15 @@
 # Noise & Quantum Channels
 
+## Learning guide
+
+- **Prerequisites:** [density matrices](../06-density-matrices/README.md), matrix adjoints, and partial traces.
+- **Goals:** apply Kraus sums, distinguish noise models, and check trace preservation and physicality.
+- **Runnable companion:** run the [noise-comparison demo](https://github.com/cicixgliamici/quantum_ed/blob/main/demos/README.md) and inspect the noise lesson in [executed notebooks](../notebooks.md).
+- **Practice:** attempt [Validate a noise channel](https://github.com/cicixgliamici/quantum_ed/blob/main/exercises/03-validate-noise-channel/README.md), then inspect why Bell-like probabilities do not certify entanglement.
+- **References:** [Bell-pair noise study](bell-noise-study.md), [state metrics](FIDELITY.md), and [scientific scope](../reference/scientific-scope.md).
+
+## Overview
+
 In textbook quantum mechanics, quantum systems are often treated as completely closed, evolving strictly under unitary operators ($|\psi'\rangle = U|\psi\rangle$). However, real-world quantum hardware is an **open quantum system**: physical qubits inevitably interact with their surrounding environment (thermal baths, stray electromagnetic fields, material defects, and control line fluctuations).
 
 These environmental interactions introduce **noise, decoherence, and dissipation**, which degrade quantum information. To mathematically model, analyze, and mitigate these effects, quantum computing uses the framework of **quantum channels** and **completely positive trace-preserving (CPTP) maps**.

@@ -1,5 +1,15 @@
 # Quantum Hardware & Physical Qubits
 
+## Learning guide
+
+- **Prerequisites:** [circuits](../05-circuits-and-gates/README.md), [density matrices](../06-density-matrices/README.md), and [noise](../07-noise-and-channels/README.md).
+- **Goals:** relate physical encodings to noise, routing, readout, and conditional resource estimates.
+- **Runnable companion:** run the readout-model Python example below; its assumptions are stated beside the code.
+- **Practice:** change the readout confusion probabilities and explain which observed distribution changes; identify which parameters would require hardware calibration.
+- **References:** [scientific scope](../reference/scientific-scope.md) and the dated primary sources cited next to each hardware claim below.
+
+## Overview
+
 Hardware constrains how an ideal circuit is implemented: qubits lose coherence,
 gates and readout are imperfect, interactions have limited connectivity, and
 states can leak outside the computational subspace. This chapter separates

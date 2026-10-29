@@ -1,5 +1,15 @@
 # Density Matrices & Quantum Subsystems
 
+## Learning guide
+
+- **Prerequisites:** [states](../02-qubits-and-states/README.md), [measurement](../03-measurement/README.md), and [entanglement](../04-entanglement/README.md).
+- **Goals:** represent mixtures, calculate partial traces and purity, and apply fidelity conventions correctly.
+- **Runnable companion:** run the [Bell reduced-state demo](https://github.com/cicixgliamici/quantum_ed/blob/main/demos/README.md) and the Python example below.
+- **Practice:** compare the density matrix of a plus state with an equal mixture of zero and one; check their off-diagonal entries and purity.
+- **References:** [fidelity and trace distance](../07-noise-and-channels/FIDELITY.md) and [physical-state input contracts](../reference/input-contracts.md).
+
+## Overview
+
 The state-vector formalism ($|\psi\rangle \in \mathcal{H}$) is sufficient for closed, isolated quantum systems undergoing ideal unitary dynamics. However, real-world quantum computing requires a more general mathematical framework: the **density operator** (or **density matrix**) formalism.
 
 Density matrices are indispensable whenever:

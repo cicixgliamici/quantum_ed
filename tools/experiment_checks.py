@@ -19,6 +19,7 @@ FAILURE_PROBABILITY = 1e-6
 # QPE's numerical phase label is its reverse, 001, because wire 0 has weight 1.
 EXPECTED_PROBABILITIES = {
     "bell-state": {"00": 0.5, "11": 0.5},
+    "entanglement-swapping": {"00": 0.5, "11": 0.5},
     "superdense-coding": {"10": 1.0},
     "quantum-teleportation": {"1": 1.0},
     "deutsch-jozsa": {"100": 1.0},
@@ -123,6 +124,22 @@ def teleportation_inputs() -> list[tuple[float, float, np.ndarray]]:
             [np.exp(1j * phi) * np.sin(theta / 2)]])) for theta, phi in angles]
 
 
+def assert_swapped_state(actual: np.ndarray) -> None:
+    """Check all four outcome branches, including their endpoint relative phase."""
+    state = np.asarray(actual, dtype=complex).ravel()
+    if state.shape != (16,) or not np.all(np.isfinite(state)):
+        raise AssertionError("Swapping requires a finite four-qubit state")
+    amplitudes = state.reshape(2, 2, 2, 2)
+    expected = np.array([1, 0, 0, 1], dtype=complex) / np.sqrt(2)
+    for phase_bit in range(2):
+        for flip_bit in range(2):
+            branch = amplitudes[:, phase_bit, flip_bit, :].reshape(4)
+            probability = float(np.vdot(branch, branch).real)
+            if not np.isclose(probability, 0.25, atol=ABSOLUTE_TOLERANCE, rtol=0):
+                raise AssertionError("Each of Bob's swapping outcomes must have probability 1/4")
+            assert_state_equivalent(branch / np.sqrt(probability), expected)
+
+
 def qiskit_wire_state(circuit) -> np.ndarray:
     """Reverse Qiskit's tensor axes, not the physical circuit's wire labels."""
     from qiskit.quantum_info import Statevector
@@ -135,6 +152,8 @@ def output_wires(name: str) -> list[int]:
     """Ancillas and Alice's qubits are omitted from logical output registers."""
     if name == "quantum-teleportation":
         return [2]
+    if name == "entanglement-swapping":
+        return [0, 3]
     width = len(next(iter(EXPECTED_PROBABILITIES[name])))
     return list(range(width))
 

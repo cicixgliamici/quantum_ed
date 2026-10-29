@@ -13,6 +13,7 @@ from quantum_ed.states import ket0, normalize
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 REVIEWED_PAGES = [
+    "docs/11-quantum-networks/entanglement-swapping.md",
     "docs/04-entanglement/quantum-teleportation.md",
     "docs/06-density-matrices/README.md",
     "docs/07-noise-and-channels/README.md",

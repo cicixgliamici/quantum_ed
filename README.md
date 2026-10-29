@@ -2,14 +2,18 @@
 
 Quantum computing from explicit mathematics to verifiable simulations.
 
-Quantum-Ed combines a small NumPy toolkit, structured theory, seven notebooks,
-and nine experiments expressed in NumPy, Qiskit, PennyLane, Q#, and OpenQASM 3.
+Quantum-Ed combines a small NumPy toolkit, structured theory, eight notebooks,
+and ten experiments expressed in NumPy, Qiskit, PennyLane, Q#, and OpenQASM 3.
 Its central question is whether the code reproduces the mathematical claim:
 including relative phases, bit order, mixed states, and numerical tolerances.
 
 Start with the [ten-minute reviewer guide](docs/reviewer-guide.md), the
 [Bell-pair noise study](studies/bell_noise/README.md), or the
 [experiment index](experiments/README.md).
+
+The [quantum communication and networks chapter](docs/11-quantum-networks/README.md)
+connects teleportation to a four-qubit entanglement-swapping experiment and
+distinguishes ideal resource states from physical link-delivery assumptions.
 
 ## A complete study: what survives when a Bell pair becomes noisy?
 
@@ -31,10 +35,10 @@ available as PNG and SVG and can be regenerated from source.
 | Component | Concrete evidence |
 | --- | --- |
 | NumPy teaching toolkit | [States](src/quantum_ed/states.py), [gates](src/quantum_ed/gates.py), measurement, density matrices, and single-qubit noise channels |
-| Nine concept-first experiments | Bell states, superdense coding, teleportation, Deutsch-Jozsa, Bernstein-Vazirani, Grover, QFT, QPE, and a one-qubit VQE |
+| Ten concept-first experiments | Bell states, superdense coding, teleportation, entanglement swapping, Deutsch-Jozsa, Bernstein-Vazirani, Grover, QFT, QPE, and a one-qubit VQE |
 | Scientific comparisons | [Shared analytical checks](tools/validate_experiments.py), full-state phase-sensitive checks for QFT/teleportation, and explicit sampling bounds |
 | Bell-noise investigation | [Derivations and interpretation](docs/07-noise-and-channels/bell-noise-study.md), independent models, validated data, and reproducible plots |
-| Learning material | [Theory chapters](docs/index.md), [seven notebooks](notebooks/README.md), and [three exercises](exercises/README.md) with executable solutions |
+| Learning material | [Theory chapters](docs/index.md), [eight notebooks](notebooks/README.md), and [three exercises](exercises/README.md) with executable solutions |
 | Automated verification | [Tests](tests/), repository/source-link checks, notebook execution, and strict documentation builds in [CI](.github/workflows/quality.yml) |
 
 ## Run a first example
@@ -118,11 +122,18 @@ model assumptions, dated hardware estimates, and numerical evidence.
 | `src/quantum_ed/` | Installable NumPy-first toolkit |
 | `docs/` | Theory, study report, reviewer route, and references |
 | `notebooks/` | Ordered interactive lessons |
+| `examples/` | SDK-specific tutorials, starting with Qiskit |
 | `experiments/` | Equivalent concepts across five ecosystems |
 | `studies/` | Capability comparisons and the complete Bell-noise study |
 | `exercises/` | Prompts and reference solutions |
-| `demos/` | Small runnable demonstrations |
+| `demos/` | Short NumPy demonstrations with a dedicated index |
 | `tests/` and `tools/` | Mathematical, behavioral, and repository checks |
+
+Use the [learning path](docs/learning-path.md) to choose material by purpose.
+The [demo index](demos/README.md), [SDK examples](examples/README.md), and
+[tool index](tools/README.md) explain their run commands. The
+[project design](docs/project-design.md) records the engineering choices and
+the limits of the contribution.
 
 ## Scope and future directions
 

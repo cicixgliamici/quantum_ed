@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "name": "entanglement-swapping",
+  "category": "quantum-networking",
+  "theory": "docs/11-quantum-networks/entanglement-swapping.md",
+  "expected_result": "Each Bob outcome has probability 1/4; outcome-dependent corrections give Alice and Charlie Phi-plus, with P(00)=P(11)=1/2.",
+  "implementations": {
+    "numpy": "experiments/entanglement-swapping/numpy/entanglement_swapping.py",
+    "qiskit": "experiments/entanglement-swapping/qiskit/entanglement_swapping.py",
+    "pennylane": "experiments/entanglement-swapping/pennylane/entanglement_swapping.py",
+    "qsharp": "experiments/entanglement-swapping/qsharp/EntanglementSwapping.qs",
+    "openqasm": "experiments/entanglement-swapping/openqasm/entanglement_swapping.qasm"
+  }
+}

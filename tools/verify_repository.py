@@ -10,6 +10,12 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import unquote, urlsplit
 
+# Support both the documented script command and package imports in tests.
+if __package__:
+    from .experiment_catalog import catalog_updates
+else:
+    from experiment_catalog import catalog_updates
+
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 EXPERIMENTS_ROOT = REPOSITORY_ROOT / "experiments"
 REQUIRED_ECOSYSTEMS = {"numpy", "qiskit", "qsharp", "openqasm"}
@@ -160,6 +166,10 @@ def collect_errors() -> list[str]:
         errors.extend(validate_manifest(manifest))
     for document in markdown_documents():
         errors.extend(validate_markdown_links(document))
+    if not errors:
+        for document in catalog_updates(REPOSITORY_ROOT):
+            errors.append(f"{document.relative_to(REPOSITORY_ROOT)}: stale experiment catalog; "
+                          "run python tools/experiment_catalog.py --write")
     return errors
 
 

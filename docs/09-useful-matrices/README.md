@@ -1,5 +1,15 @@
 # Useful Matrices in Quantum Computing
 
+## Learning guide
+
+- **Prerequisites:** [linear algebra](../01-linear-algebra/README.md) and the [gate conventions](../05-circuits-and-gates/README.md).
+- **Goals:** look up matrices while preserving basis order, phase, and normalization conventions.
+- **Runnable companion:** evaluate the NumPy examples below and compare them with the [gate definitions](https://github.com/cicixgliamici/quantum_ed/blob/main/src/quantum_ed/gates.py).
+- **Practice:** verify that X squared is the identity and that H followed by Z followed by H gives X; compare the complete matrices.
+- **References:** [bit ordering](../reference/bit-ordering.md) and [input contracts](../reference/input-contracts.md). Use this page as a lookup alongside the learning path.
+
+## Overview
+
 This page collects the most common matrices used in introductory quantum computing.
 
 The goal is not to create a disconnected formula sheet, but to provide a practical reference that links:

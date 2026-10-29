@@ -10,7 +10,7 @@ import numpy as np
 from experiment_checks import (
     ABSOLUTE_TOLERANCE, EXPECTED_PROBABILITIES, REPOSITORY_ROOT, SHOTS,
     assert_probabilities, assert_sampled_counts, assert_state_equivalent,
-    assert_teleported_state, circuit_probabilities, expected_qft, load_module,
+    assert_teleported_state, assert_swapped_state, circuit_probabilities, expected_qft, load_module,
     manifests, probabilities_dict, qiskit_wire_state, sample_circuit,
     teleportation_inputs,
 )
@@ -51,6 +51,10 @@ def numpy_probabilities(name: str, module) -> dict[str, float]:
 
 def validate_python_states(name: str, module, ecosystem: str) -> None:
     """Inspect information that measurement probabilities cannot reveal."""
+    if name == "entanglement-swapping":
+        actual = (qiskit_wire_state(module.build_circuit()) if ecosystem == "qiskit"
+                  else module.swapped_state())
+        assert_swapped_state(actual)
     if name == "quantum-fourier-transform":
         for input_value in range(8):
             if ecosystem == "qiskit":
@@ -98,6 +102,8 @@ def validate_openqasm(manifest: dict) -> None:
     assert_sampled_counts(sample_circuit(circuit, name), EXPECTED_PROBABILITIES[name])
     if name == "quantum-fourier-transform":
         assert_state_equivalent(qiskit_wire_state(circuit), expected_qft())
+    if name == "entanglement-swapping":
+        assert_swapped_state(qiskit_wire_state(circuit))
     if name == "quantum-teleportation":
         # Inspect the actual imported protocol, rather than a Python copy of it.
         protocol = next(item.operation for item in circuit.data if item.operation.name == "teleport")
@@ -121,11 +127,15 @@ def qsharp_counts(results: list) -> dict[str, int]:
 
 def validate_qsharp_states(name: str, qsharp) -> None:
     """Inspect shared Q# preparations before their terminal measurements."""
-    if name not in {"quantum-fourier-transform", "quantum-teleportation"}:
+    if name not in {"quantum-fourier-transform", "quantum-teleportation", "entanglement-swapping"}:
         return
-    qsharp.eval("use diagnostics = Qubit[3];")
+    width = 4 if name == "entanglement-swapping" else 3
+    qsharp.eval(f"use diagnostics = Qubit[{width}];")
     try:
-        if name == "quantum-fourier-transform":
+        if name == "entanglement-swapping":
+            qsharp.eval("PrepareSwapping(diagnostics);")
+            assert_swapped_state(qsharp.dump_machine().as_dense_state())
+        elif name == "quantum-fourier-transform":
             for input_value in range(8):
                 qsharp.eval(f"PrepareQft({input_value}, diagnostics);")
                 assert_state_equivalent(qsharp.dump_machine().as_dense_state(), expected_qft(input_value))

@@ -2,6 +2,7 @@
 
 import logging
 from pathlib import Path
+import re
 
 import nbformat
 from mkdocs.config.defaults import MkDocsConfig
@@ -13,12 +14,27 @@ REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 LOGGER = logging.getLogger("mkdocs.notebooks")
 
 
-def render_notebook(source: Path) -> tuple[str, dict[str, bytes]]:
+def notebook_title(source: Path) -> str:
+    """Keep lesson numbers in filenames and readable titles in navigation."""
+    notebook = nbformat.read(source, as_version=4)
+    for cell in notebook.cells:
+        if cell.cell_type == "markdown":
+            for line in cell.source.splitlines():
+                if line.startswith("# "):
+                    return re.sub(r"^\d+\s*[—–:-]\s*", "", line[2:].strip())
+    return source.stem.replace("-", " ").capitalize()
+
+
+def render_notebook(source: Path, *, executed_path: Path | None = None) -> tuple[str, dict[str, bytes]]:
     """Return executed Markdown and figures without modifying the source file."""
     notebook = nbformat.read(source, as_version=4)
     # Fail the build on execution errors; stale or partial results must not publish.
     executor = ExecutePreprocessor(timeout=120, kernel_name="python3")
     executor.preprocess(notebook, {"metadata": {"path": str(REPOSITORY_ROOT)}})
+    if executed_path is not None:
+        # Preserve the exact executed copy used by the site as reviewable CI evidence.
+        executed_path.parent.mkdir(parents=True, exist_ok=True)
+        nbformat.write(notebook, executed_path)
     exporter = MarkdownExporter()
     # Prefix figure names because every notebook shares the generated directory.
     markdown, resources = exporter.from_notebook_node(
@@ -38,7 +54,9 @@ def on_files(files: Files, config: MkDocsConfig, **kwargs) -> Files:
         raise ValueError("No source notebooks found; refusing to publish an empty collection.")
     for source in notebooks:
         LOGGER.info("Executing notebook: %s", source.name)
-        markdown, figures = render_notebook(source)
+        markdown, figures = render_notebook(
+            source, executed_path=REPOSITORY_ROOT / "build/executed-notebooks" / source.name
+        )
         files.append(File.generated(config, f"notebooks/{source.stem}.md", content=markdown))
         files.append(File.generated(config, f"notebooks/{source.name}", content=source.read_bytes()))
         for name, content in figures.items():
@@ -47,7 +65,7 @@ def on_files(files: Files, config: MkDocsConfig, **kwargs) -> Files:
     for entry in config.nav:
         if entry.get("Notebooks") == "notebooks.md":
             entry["Notebooks"] = [{"Overview": "notebooks.md"}] + [
-                {source.stem: f"notebooks/{source.stem}.md"} for source in notebooks
+                {notebook_title(source): f"notebooks/{source.stem}.md"} for source in notebooks
             ]
     return files
 
@@ -57,7 +75,7 @@ def on_page_markdown(markdown: str, page, **kwargs) -> str:
     if page.file.src_uri != "notebooks.md":
         return markdown
     links = [
-        f"- [{source.stem}](notebooks/{source.stem}.md)"
+        f"- [{notebook_title(source)}](notebooks/{source.stem}.md)"
         for source in sorted((REPOSITORY_ROOT / "notebooks").glob("*.ipynb"))
     ]
     return markdown + "\n\n## Read the lessons\n\n" + "\n".join(links) + "\n"

@@ -15,6 +15,9 @@ to achieve:
 
 ## 1. Physical Principle & Resource Accounting
 
+For the network extension, see [quantum communication and networks](../11-quantum-networks/README.md)
+and the [four-branch swapping experiment](../11-quantum-networks/entanglement-swapping.md).
+
 Quantum teleportation does not transmit matter or energy; it teleports the **quantum state information**.
 
 ### What Teleportation Does NOT Do

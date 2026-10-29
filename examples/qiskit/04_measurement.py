@@ -344,7 +344,7 @@ def example_bit_ordering() -> None:
 
         q0 = 1
         q1 = 0
-        q2 = 1
+        q2 = 0
 
     Qiskit normally prints the classical string as:
 
@@ -364,7 +364,8 @@ def example_bit_ordering() -> None:
     )
 
     circuit.x(0)
-    circuit.x(2)
+
+    # An asymmetric bit pattern makes reversal visible; 101 reads the same both ways.
 
     circuit.measure(
         range(3),
@@ -378,7 +379,7 @@ def example_bit_ordering() -> None:
     )
 
     print(
-        "q0=1, q1=0, q2=1 is displayed as '101'."
+        "q0=1, q1=0, q2=0 is displayed as '001'."
     )
 
     print(

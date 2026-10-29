@@ -1,5 +1,15 @@
 # Circuits & Gates
 
+## Learning guide
+
+- **Prerequisites:** [qubits](../02-qubits-and-states/README.md), tensor products, and [measurement](../03-measurement/README.md).
+- **Goals:** compose gates in the correct temporal order, interpret controlled operations, and construct Bell circuits.
+- **Runnable companion:** run the [Bell-amplitude demo](https://github.com/cicixgliamici/quantum_ed/blob/main/demos/README.md), then compare the [Qiskit tutorials](https://github.com/cicixgliamici/quantum_ed/blob/main/examples/qiskit/README.md).
+- **Practice:** attempt the chapter exercises before reading the [worked solutions](solutions.md).
+- **References:** [useful matrices](../09-useful-matrices/README.md) and [bit ordering](../reference/bit-ordering.md).
+
+## Overview
+
 Quantum circuits are built by applying gates to quantum states.
 
 In the state-vector model used in this repository:

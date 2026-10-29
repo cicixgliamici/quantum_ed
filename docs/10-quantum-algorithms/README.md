@@ -1,5 +1,15 @@
 # Quantum Algorithms
 
+## Learning guide
+
+- **Prerequisites:** [circuits and gates](../05-circuits-and-gates/README.md), [measurement](../03-measurement/README.md), and complex phases.
+- **Goals:** identify oracle, interference, amplification, Fourier, and variational patterns, with their stated assumptions and limits.
+- **Runnable companion:** choose a concept in the [experiment catalog](../experiments.md) and run its NumPy entrypoint before comparing SDK implementations.
+- **Practice:** work through Grover's iteration-count problem below, then inspect the Grover lesson in [executed notebooks](../notebooks.md).
+- **References:** [ecosystem comparison](language-comparison.md), [experiment validation](../reference/experiment-validation.md), and [scientific scope](../reference/scientific-scope.md).
+
+## Overview
+
 Quantum algorithms exploit the uniquely quantum mechanical phenomena of **superposition, entanglement, and quantum interference** to solve specific computational problems asymptotically faster than any known classical algorithm.
 
 A common misconception is that a quantum computer achieves speedups through "brute-force parallel processing" by evaluating all inputs simultaneously. If one simply prepares an equal superposition of all $2^n$ inputs and measures, the wave function collapses to a single, completely random input with zero computational advantage.

@@ -7,6 +7,10 @@ assumptions and expected results inspectable.
 [Review the project](reviewer-guide.md){ .md-button .md-button--primary }
 [Start learning](00-intro/README.md){ .md-button }
 
+Use the [learning path](learning-path.md) to connect theory, notebooks, and
+practice, or read the [project design](project-design.md) to understand the
+implementation choices.
+
 ## Choose your route
 
 <div class="grid cards" markdown>
@@ -27,14 +31,14 @@ assumptions and expected results inspectable.
 
 - **Compare implementations**
 
-    Inspect nine experiments across NumPy, Qiskit, PennyLane, Q#, and OpenQASM 3,
+    Inspect ten experiments across NumPy, Qiskit, PennyLane, Q#, and OpenQASM 3,
     with explicit expected results and conventions.
 
     [Explore the experiments](experiments.md)
 
 - **Work through the code**
 
-    Use seven ordered notebooks for exploration and three exercises for
+    Use eight ordered notebooks for exploration and three exercises for
     practice. Run the programs locally using the documented environment.
 
     [Read the executed notebooks](notebooks.md)
@@ -57,6 +61,12 @@ Inspect the [CSV measurements](assets/bell-noise/results.csv) and
 [validation summary](assets/bell-noise/summary.json) alongside the derivations.
 
 ## Start here
+
+For a protocol spanning three nodes, explore
+[quantum communication and networks](11-quantum-networks/README.md).
+The [swapping experiment](11-quantum-networks/entanglement-swapping.md) connects
+two Bell pairs and inspects all four measurement branches, including the
+classical corrections that make the endpoint resource usable.
 
 1. Review the [mathematical foundations](01-linear-algebra/README.md).
 2. Learn how [qubits and states](02-qubits-and-states/README.md) are represented.

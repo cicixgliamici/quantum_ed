@@ -19,6 +19,18 @@ def lock_fingerprint() -> str:
     return hashlib.sha256(contents).hexdigest()
 
 
+def validate_wheel_contents(distribution) -> None:
+    """Reject tutorial modules left in setuptools' incremental build directory."""
+    unexpected = [
+        str(path).replace("\\", "/") for path in distribution.files or []
+        if str(path).endswith(".py") and path.parts[0] != "quantum_ed"
+    ]
+    if unexpected:
+        raise ValueError("Unexpected Python sources in the quantum-ed wheel: "
+                         + ", ".join(unexpected)
+                         + ". Clean build/lib and reinstall the package.")
+
+
 def project_installation(require_wheel: bool) -> dict:
     """Reject source-tree imports when a normal package installation is required."""
     import quantum_ed
@@ -30,6 +42,8 @@ def project_installation(require_wheel: bool) -> dict:
     in_environment = module_path.is_relative_to(Path(sys.prefix).resolve())
     if require_wheel and (editable or not in_environment):
         raise ValueError(f"Expected a noneditable package inside {sys.prefix}; imported {module_path}")
+    if require_wheel:
+        validate_wheel_contents(distribution)
     return {"version": distribution.version, "editable": editable,
             "inside_environment": in_environment}
 

@@ -26,6 +26,7 @@ scientific validation, including actual program results.
 | Experiment | Shared analytical reference |
 | --- | --- |
 | Bell pair | `P(00) = P(11) = 1/2`; all other outcomes impossible |
+| Entanglement swapping | Four Bob outcomes with probability `1/4` each; every corrected endpoint branch is Phi-plus |
 | Superdense coding | Default decoded message `10` |
 | Teleportation | Bob recovers the full input density matrix |
 | Deutsch-Jozsa | `100` in input-wire order for the oracle `f(x)=x_0` |
@@ -54,6 +55,14 @@ optimizer output. Q# and OpenQASM only implement the optimal ansatz; validation
 checks their resulting measurement, without claiming they run an optimizer.
 
 ## Wire order and classical destinations
+
+Swapping uses four wires in order Alice, Bob-left, Bob-right, Charlie. Validators
+inspect each conditional endpoint state, including its relative phase, and
+check that every Bob outcome has probability `1/4`. This includes NumPy,
+Qiskit, PennyLane, the imported OpenQASM circuit, and Q#'s shared
+`PrepareSwapping` operation. Only endpoint wires 0 and 3 contribute to terminal
+sampling. The separate core tests also verify the uncorrected `I4/4` ensemble
+and the `I2/2` local marginals; see the [derivation](../11-quantum-networks/entanglement-swapping.md).
 
 Comparisons use increasing logical output wire index. Qiskit's tensor axes
 are reversed before state-vector comparisons. Marginal probabilities omit

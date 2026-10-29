@@ -6,6 +6,26 @@ with an explanation instead of being silently repaired.
 
 ## State vectors
 
+### Ideal network-protocol states
+
+The `quantum_ed.networks` module fixes tensor order to Alice, Bob-left,
+Bob-right, Charlie. `bell_measurement_state()` and `swapped_state()` return
+four-qubit column vectors with shape `(16, 1)`. The latter is a coherent
+deferred-measurement representation, not a post-measurement density matrix.
+
+`conditional_endpoint_state(outcome, corrected=True)` accepts exactly the
+strings `00`, `01`, `10`, or `11`, with Bob-left first. It returns the outcome
+probability and a normalized endpoint column vector with shape `(4, 1)`.
+The `corrected` argument must be a boolean. `endpoint_density(corrected=False)`
+returns the `(4, 4)` ensemble before feed-forward by default; setting
+`corrected=True` averages the corrected branches instead.
+
+The protocol starts with two perfect Bell pairs. No distance, transmission
+rate, memory lifetime, or photon-loss parameters are accepted by this ideal
+model. See [entanglement swapping](../11-quantum-networks/entanglement-swapping.md).
+
+### General state-vector inputs
+
 State vectors have shape `(2**n, 1)`. Flat vectors and row vectors are rejected,
 except that `fidelity_pure` retains its documented flat-vector convenience.
 `probs_comp_basis`, `measure_comp_basis`, and `bloch_vector` support exactly

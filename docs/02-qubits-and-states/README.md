@@ -1,5 +1,15 @@
 # Qubits & Quantum States
 
+## Learning guide
+
+- **Prerequisites:** [linear algebra](../01-linear-algebra/README.md), especially normalization and complex inner products.
+- **Goals:** distinguish amplitudes from probabilities, global from relative phase, and pure-state coordinates from measurement outcomes.
+- **Runnable companion:** follow the Bloch-sphere lesson in [executed notebooks](../notebooks.md) and the Python example below.
+- **Practice:** change a relative phase and predict which Bloch coordinates change while computational-basis probabilities remain fixed.
+- **References:** [state utilities](https://github.com/cicixgliamici/quantum_ed/blob/main/src/quantum_ed/states.py) and [input contracts](../reference/input-contracts.md).
+
+## Overview
+
 The fundamental unit of classical information is the **bit**, which takes one of two discrete values: $0$ or $1$.
 The fundamental unit of quantum information is the **quantum bit**, or **qubit**, which exists in a two-dimensional complex Hilbert space $\mathbb{C}^2$.
 

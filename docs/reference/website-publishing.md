@@ -44,6 +44,9 @@ The website provides theory, study figures, downloadable CSV/JSON evidence,
 and [executed notebook lessons](../notebooks.md) with code, results, and plots.
 Notebook pages and figure assets are generated during each MkDocs build;
 source notebooks are never overwritten. Each lesson includes a source download.
+The Quality workflow preserves the same executed copies used to build the site
+in its `documentation-reproduction` artifact. Notebook execution and website
+rendering share one job so they do not repeat the full lesson sequence.
 
 Python and quantum SDK examples run in a local environment; GitHub Pages
 serves static files and does not execute those programs for visitors.

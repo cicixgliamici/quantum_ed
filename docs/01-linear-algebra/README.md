@@ -1,5 +1,15 @@
 # Linear Algebra Essentials
 
+## Learning guide
+
+- **Prerequisites:** [introduction and conventions](../00-intro/README.md), basic matrix multiplication, and complex arithmetic.
+- **Goals:** calculate inner products, adjoints, normalization, tensor products, and projectors.
+- **Runnable companion:** inspect the [linear-algebra utilities](https://github.com/cicixgliamici/quantum_ed/blob/main/src/quantum_ed/linalg.py) and run the Python example below.
+- **Practice:** attempt [Normalize a state](https://github.com/cicixgliamici/quantum_ed/blob/main/exercises/01-normalize-state/README.md) before opening its solution.
+- **References:** [useful matrices](../09-useful-matrices/README.md) and [input contracts](../reference/input-contracts.md).
+
+## Overview
+
 Quantum computing is applied linear algebra over complex vector spaces. Every concept in quantum information—from single-qubit states and quantum gates to measurement collapse and multi-qubit entanglement—has a direct, exact mathematical counterpart in linear algebra.
 
 This chapter provides a comprehensive, rigorous refresher of the linear algebra tools you will use throughout this repository.
